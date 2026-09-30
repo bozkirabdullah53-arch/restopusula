@@ -10,13 +10,13 @@ Başlangıçta işletme verisi bulunmaz. Göstergeler `—` gösterir; örnek ci
 
 ## GitHub üzerinden paylaşılacak ön izleme
 
-GitHub Pages için `docs/index.html` ve `docs/.nojekyll` hazırdır. Yalnızca `docs` klasörü yayın kaynağı olarak seçilmelidir. Ön izleme gerçek arayüzdür; kayıt, hesap oluşturma ve ödeme işlemleri kapalıdır. Veritabanı veya gerçek işletme verisi yayın dosyalarına eklenmez.
+**Canlı ön izleme:** [RestoPusula panelini aç](https://bozkirabdullah53-arch.github.io/restopusula-onizleme/)
 
-Bir kez **Settings → Pages → Source: Deploy from a branch → Branch: main → Folder: /docs → Save** seçin. Yayın tamamlanınca GitHub'ın **Visit site** bağlantısı paylaşılabilir. Beklenen adres: `https://bozkirabdullah53-arch.github.io/restopusula/`. Bu adres, Pages ayarı açılıp yayın başarıyla tamamlandıktan sonra çalışır.
+[Yayın deposu](https://github.com/bozkirabdullah53-arch/restopusula-onizleme), yalnızca derlenmiş `index.html` arayüzünü ve `.nojekyll` dosyasını içerir. Ana uygulama deposu gizlidir. Ön izleme gerçek arayüzdür; modüller gezilebilir, kayıt, hesap oluşturma ve ödeme işlemleri kapalıdır. Veritabanı veya gerçek işletme verisi yayın dosyalarına eklenmez.
 
-Depo gizli olduğu için kişisel GitHub hesabında GitHub Pro gerekir. Ücretsiz hesapta ana deponun görünürlüğünü değiştirmek yerine, yalnızca yayın dosyalarının bulunduğu ayrı bir herkese açık ön izleme deposu kullanılabilir.
+GitHub Pages, `restopusula-onizleme` deposunda **Deploy from a branch → main → / (root)** kaynağından yayınlanır. İlk yayın başarıyla tamamlandı.
 
-Arayüz değişikliklerinden sonra `frontend` içinde `npm run build`, proje kökünde `python scripts/make_preview.py` çalıştırıp `docs` klasöründeki güncellenen dosyaları GitHub'a ekleyin.
+Arayüz değişikliklerinden sonra `frontend` içinde `npm run build`, proje kökünde `python scripts/make_preview.py` çalıştırın. Oluşan `docs/index.html` ve `docs/.nojekyll` dosyalarını ön izleme deposunun kökünde güncelleyin. Ön izleme deposuna kaydedilen değişiklikler Pages tarafından yeniden yayınlanır.
 
 ## Windows'ta kurulum
 
