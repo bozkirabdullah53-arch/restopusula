@@ -36,19 +36,6 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Verify translated and responsive interface
         run: python scripts/check_ui.py
-      - name: Export review bytes
-        if: always()
-        run: |
-          python - <<'PY'
-          import base64
-          from pathlib import Path
-          for prefix, path in [('RPREVIEW', Path('Onizleme.html')), ('RSHOT', Path('ui-checks/dashboard-1440.jpg')), ('RDOCS', Path('docs/index.html')), ('RSHOTM', Path('ui-checks/dashboard-390.jpg')), ('RSHOTP', Path('ui-checks/products-1440.jpg'))]:
-              if not path.exists():
-                  continue
-              encoded = base64.b64encode(path.read_bytes()).decode('ascii')
-              for index in range(0, len(encoded), 6000):
-                  print(f'{prefix}:{index // 6000:04d}:' + encoded[index:index + 6000])
-          PY
       - name: Save preview and screenshots
         if: always()
         uses: actions/upload-artifact@v4
