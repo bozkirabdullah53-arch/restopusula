@@ -8,7 +8,7 @@ output = root / 'ui-checks'
 output.mkdir(exist_ok=True)
 errors = []
 results = []
-forbidden = re.compile(r'reçet|restaurant os|toggle sidebar|\\b(?:completed|pending|reversed|sale_reversal|expense_reversal)\\b', re.I)
+forbidden = re.compile(r'reçet|restaurant os|toggle sidebar|\b(?:completed|pending|reversed|sale_reversal|expense_reversal)\b', re.I)
 
 def check_page(page, view, width):
     expect(page.locator('.page-heading h1')).to_be_visible()
