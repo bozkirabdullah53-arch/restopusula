@@ -1,0 +1,16 @@
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.venv/
+backend/data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log
