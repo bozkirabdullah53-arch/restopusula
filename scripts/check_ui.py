@@ -66,6 +66,17 @@ with tempfile.TemporaryDirectory() as data:
             page.get_by_role('tab', name='Kullanıcı ve yetkiler', exact=True).click()
             expect(page.get_by_role('cell', name='İşletme sahibi', exact=True)).to_be_visible()
 
+            # Authenticated Excel download must keep ISO dates in API requests.
+            page.goto('http://127.0.0.1:8937/?view=reports')
+            with page.expect_response(lambda response: '/api/export?' in response.url) as report_response:
+                page.get_by_role('button', name='Excel .xlsx', exact=True).first.click()
+            response = report_response.value
+            assert response.status == 200, f'Excel download failed: HTTP {response.status}, {response.url}'
+            exported = page.request.get(response.url)
+            assert exported.ok, exported.text()
+            assert exported.headers['content-type'].startswith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            assert exported.body().startswith(b'PK'), 'Excel export must be an XLSX archive'
+
             offline_requests = []
             offline = browser.new_page(locale='tr-TR', viewport={'width': 1440, 'height': 960}, reduced_motion='reduce')
             offline.on('pageerror', lambda error: errors.append(str(error)))
