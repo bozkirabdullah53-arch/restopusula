@@ -9,6 +9,7 @@ from datetime import date, datetime
 from fastapi import HTTPException
 from .database import uid, now, insert, one, rows, audit
 from .security import record, scoped_branch, require_permission, password_hash, ROLES
+from .presentation import code_label, role_label
 
 def text(v,field='Ad',required=True,max_len=250):
     if not isinstance(v,str) or len(v.strip())>max_len or (required and not v.strip()):raise HTTPException(400,f'{field} geçerli olmalı (en fazla {max_len} karakter).')
@@ -100,7 +101,7 @@ def execute(c,u,p):
         if old:c.execute('UPDATE recipes SET quantity=? WHERE id=?',(q,old['id']));id=old['id']
         else:
             id=uid();insert(c,'recipes',dict(id=id,tenant_id=u['tenant_id'],product_id=prod['id'],material_id=mat['id'],quantity=q))
-        desc=f'{prod["name"]} reçetesine {q} {mat["unit"]} {mat["name"]} kaydedildi'
+        desc=f'{prod["name"]} ürün tarifine {q} {mat["unit"]} {mat["name"]} kaydedildi'
     elif action=='material':
         r=dict(id=uid(),tenant_id=u['tenant_id'],name=text(p.get('name')),unit=choice(p.get('unit'),['kg','g','L','mL','adet','kasa','koli','paket']),cost_cents=cents(p['cost'],'Birim maliyet') if p.get('cost') not in [None,''] else None,min_stock=quantity(p.get('min_stock',0),0),created_at=now());insert(c,'materials',r);id=r['id'];q=quantity(p.get('quantity',0),0)
         inventory_change(c,u,b,id,q,'opening','Açılış stoğu',day(p.get('date')),id,r['cost_cents']);desc=f'Malzeme eklendi: {r["name"]}; açılış {q} {r["unit"]}'
@@ -120,7 +121,7 @@ def execute(c,u,p):
                 avg=None if total>0 and mat['cost_cents'] is None else money_round((Decimal(str(total))*Decimal(mat['cost_cents'] or 0)+Decimal(str(q))*cost)/(Decimal(str(total))+Decimal(str(q))))
                 c.execute('UPDATE materials SET cost_cents=? WHERE id=?',(avg,mat['id']))
             inventory_change(c,u,b,mat['id'],q if kind=='in' else -q,kind,reason,date_value,id,cost)
-        desc=f'{mat["name"]}: {kind} işlemi, {q} {mat["unit"]}'
+        desc=f'{mat["name"]}: {code_label(kind).lower()} işlemi, {q} {mat["unit"]}'
     elif action=='account':
         r=base(u,b)|dict(name=text(p.get('name')),type=choice(p.get('type'),['cash','bank','pos']),opening_cents=cents(p.get('opening'),'Açılış bakiyesi',-1000000000));insert(c,'accounts',r);id=r['id'];desc=f'Hesap eklendi: {r["name"]}'
     elif action=='account_tx':
@@ -133,7 +134,7 @@ def execute(c,u,p):
             expected=a['opening_cents']+one(c,'SELECT COALESCE(SUM(amount_cents),0) AS n FROM ledger WHERE account_id=?',(a['id'],))['n'];delta=amount-expected
             ledger_entry(c,u,a['id'],delta,'cash_count',date_value,id,f'{note} | Beklenen: {expected/100:.2f} TL; gerçek: {amount/100:.2f} TL; fark: {delta/100:.2f} TL')
         else:ledger_entry(c,u,a['id'],amount if kind=='in' else -amount,kind,date_value,id,note)
-        desc=f'{a["name"]}: {kind} işlemi ({amount/100:.2f} TL)'
+        desc=f'{a["name"]}: {code_label(kind).lower()} işlemi ({amount/100:.2f} TL)'
     elif action=='sale':
         lines=p.get('items')
         if not isinstance(lines,list) or not 1<=len(lines)<=100:raise HTTPException(400,'1–100 satış kalemi ekleyin.')
@@ -169,7 +170,7 @@ def execute(c,u,p):
         for pr,q,gross,co in validated:insert(c,'sale_items',dict(id=uid(),tenant_id=u['tenant_id'],sale_id=id,product_id=pr['id'],name=pr['name'],quantity=q,price_cents=pr['price_cents'],vat_rate=pr['vat_rate'],cost_cents=co))
         for mat,q in consumption.items():
             material=record(c,u,'materials',mat,False)
-            inventory_change(c,u,b,mat,-float(q),'sale','Reçete tüketimi',date_value,id,material['cost_cents'])
+            inventory_change(c,u,b,mat,-float(q),'sale','Tarife göre malzeme tüketimi',date_value,id,material['cost_cents'])
         for a,amount in confirmed:ledger_entry(c,u,a['id'],amount,'sale',date_value,id,'Satış tahsilatı')
         if table:
             td['status']='Temizlik bekliyor';update_entity(c,tr,td)
@@ -266,7 +267,7 @@ def execute(c,u,p):
         permissions=p.get('permissions',{})
         if not isinstance(permissions,dict):raise HTTPException(400,'İzinler geçerli değil.')
         allowed={k:{a:bool(v.get(a,False)) for a in ['view','create','edit','approve','export','reverse']} for k,v in permissions.items() if k in ROLES['Patron'] and isinstance(v,dict)}
-        r=dict(id=uid(),tenant_id=u['tenant_id'],email=email,name=text(p.get('name')),password_hash=password_hash(p.get('password')),role=role,branch_id=mb,permissions=json.dumps(allowed),must_change=1,active=1,created_at=now());insert(c,'users',r);id=r['id'];desc=f'Kullanıcı eklendi: {r["name"]}, {role}'
+        r=dict(id=uid(),tenant_id=u['tenant_id'],email=email,name=text(p.get('name')),password_hash=password_hash(p.get('password')),role=role,branch_id=mb,permissions=json.dumps(allowed),must_change=1,active=1,created_at=now());insert(c,'users',r);id=r['id'];desc=f'Kullanıcı eklendi: {r["name"]}, {role_label(role)}'
     audit(c,u,action,desc,b)
     result={'id':id,'message':'İşlem kaydedildi.'};insert(c,'commands',dict(tenant_id=u['tenant_id'],id=key,body_hash=digest,result=json.dumps(result)))
     return result

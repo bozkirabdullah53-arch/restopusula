@@ -24,6 +24,7 @@ import {
   Tooltip,
 } from "recharts";
 import { Button } from "@/components/ui/button";
+import { displayDate } from "@/lib/presentation";
 import {
   Table,
   TableHeader,
@@ -235,7 +236,7 @@ export default function Dashboard({
           value={money(m.result)}
           sub={
             m.result === null
-              ? "Reçete / maliyet verisi gerekli"
+              ? "Ürün tarifi / maliyet verisi gerekli"
               : "Vergi öncesi · kayıtlı giderler"
           }
           icon={TrendingUp}
@@ -256,7 +257,7 @@ export default function Dashboard({
       <div className="dashboard-middle">
         <section className="panel chart-panel">
           <PanelHeading
-            title="Gelir & gider akışı"
+            title="Gelir ve gider akışı"
             sub="Kayıtlı günler · seçili dönem"
           >
             <div className="chart-legend">
@@ -277,7 +278,7 @@ export default function Dashboard({
                   data={chart}
                   margin={{ top: 12, right: 20, left: 4, bottom: 6 }}
                 >
-                  <CartesianGrid stroke="#e8ecee" vertical={false} />
+                  <CartesianGrid stroke="#e7e8de" vertical={false} />
                   <XAxis
                     dataKey="label"
                     tickLine={false}
@@ -302,14 +303,14 @@ export default function Dashboard({
                   />
                   <Line
                     dataKey="revenue"
-                    stroke="#ef683d"
+                    stroke="#b94c35"
                     strokeWidth={3}
                     dot={{ r: 3 }}
                     connectNulls={false}
                   />
                   <Line
                     dataKey="expense"
-                    stroke="#617a86"
+                    stroke="#356f5b"
                     strokeWidth={2}
                     dot={{ r: 3 }}
                     connectNulls={false}
@@ -334,8 +335,8 @@ export default function Dashboard({
             </div>
           )}
           <div className="chart-footer">
-            <span>{m.r.start}</span>
-            <span>{m.r.end}</span>
+            <span>{displayDate(m.r.start)}</span>
+            <span>{displayDate(m.r.end)}</span>
           </div>
         </section>
         <section className="panel important-panel">
@@ -344,13 +345,13 @@ export default function Dashboard({
               <span className="sparkle-icon">
                 <Sparkles size={19} />
               </span>
-              <h2>Patron için önemli</h2>
+              <h2>Öncelikli konular</h2>
             </div>
             <Pill tone={alerts.length ? "warning" : "neutral"}>
               {alerts.length ? `${alerts.length} konu` : "Veri bekleniyor"}
             </Pill>
           </div>
-          <p className="important-intro">Dikkatiniz gereken konular burada.</p>
+          <p className="important-intro">Dikkat gerektiren stok, bütçe ve ödeme konuları.</p>
           {alerts.length ? (
             <div className="insight-list">
               {alerts.slice(0, 3).map((a) => (
@@ -513,7 +514,7 @@ export default function Dashboard({
                   <div>
                     <strong>{e.name}</strong>
                     <small>
-                      {e.due_date} · {branchName(d, e.branch_id)}
+                      {displayDate(e.due_date)} · {branchName(d, e.branch_id)}
                     </small>
                   </div>
                   <b>{money(e.amount_cents)}</b>
@@ -541,7 +542,7 @@ export default function Dashboard({
       </div>
       <p className="calculation-note">
         <Info size={15} />
-        Kâr göstergesi = KDV hariç kayıtlı satış − reçete maliyeti − KDV hariç
+        Kâr göstergesi = KDV hariç kayıtlı satış − tarif maliyeti − KDV hariç
         işletme gideri. Eksik maliyette hesaplanmaz. Tedarikçi alış faturası
         gider olarak tekrar sayılmaz.
       </p>

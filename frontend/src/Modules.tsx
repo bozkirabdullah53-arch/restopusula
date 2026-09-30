@@ -49,6 +49,7 @@ import {
 } from "@/lib/domain";
 import { Blank, Pill, Metric, PanelHeading } from "./Dashboard";
 import Sales from "./Sales";
+import { statusLabel, roleLabel, channelLabel, transactionLabel, auditActionLabel, auditDescription, noteLabel, displayDate } from "@/lib/presentation";
 
 export type ViewProps = {
   d: AppData;
@@ -180,7 +181,7 @@ export default function Modules(p: ViewProps & { view: string }) {
               <Blank
                 icon={Store}
                 title="İlk şubenizi tanımlayın."
-                text="Dört şubeyle başlayabilir, yeni şubeler ekleyerek büyüyebilirsiniz."
+                text="İlk şubenizi ekleyin; satış, stok ve giderlerini aynı merkezden takip edin."
                 action={() => open("branch")}
                 label="Şube ekle"
               />
@@ -195,13 +196,13 @@ export default function Modules(p: ViewProps & { view: string }) {
         <div className="section-toolbar">
           <TabsList>
             <TabsTrigger value="catalog">Ürünler</TabsTrigger>
-            <TabsTrigger value="recipes">Reçeteler</TabsTrigger>
+            <TabsTrigger value="recipes">Ürün tarifleri</TabsTrigger>
             <TabsTrigger value="profit">Ürün kârlılığı</TabsTrigger>
           </TabsList>
           <div className="inline-actions">
             <Button variant="outline" onClick={() => open("recipe")}>
               <Plus size={16} />
-              Reçete malzemesi
+              Tarife malzeme ekle
             </Button>
             <Button onClick={() => open("product")}>
               <Plus size={16} />
@@ -213,7 +214,7 @@ export default function Modules(p: ViewProps & { view: string }) {
           <section className="panel">
             <PanelHeading
               title="Ürün kataloğu"
-              sub="Satış fiyatı, güncel reçete maliyeti ve katkı."
+              sub="Satış fiyatı, güncel tarif maliyeti ve katkı."
             >
               {search}
             </PanelHeading>
@@ -222,9 +223,9 @@ export default function Modules(p: ViewProps & { view: string }) {
                 "Ürün",
                 "Kategori",
                 "KDV dahil fiyat",
-                "Reçete maliyeti",
+                "Tarif maliyeti",
                 "KDV hariç katkı",
-                "Reçete",
+                "Ürün tarifi",
               ]}
               rows={filter(d.products).map((pr) => {
                 const cost = currentCost(d, pr.id);
@@ -259,7 +260,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                 <Blank
                   icon={UtensilsCrossed}
                   title="Menünüzü işletmenize bağlayın."
-                  text="Ürünleri ekleyin, malzemelerle reçetelerini oluşturun."
+                  text="Ürünleri ekleyin, malzemelerle ürün tariflerini oluşturun."
                   action={() => open("product")}
                   label="Ürün ekle"
                 />
@@ -270,7 +271,7 @@ export default function Modules(p: ViewProps & { view: string }) {
         <TabsContent value="recipes">
           <section className="panel">
             <PanelHeading
-              title="Reçete bileşenleri"
+              title="Ürün tarifi ve malzemeler"
               sub="Satışta her bileşen, kayıtlı birimiyle stoktan otomatik düşer."
             />
             <DataTable
@@ -348,7 +349,7 @@ export default function Modules(p: ViewProps & { view: string }) {
           <TabsList>
             <TabsTrigger value="stock">Stok görünümü</TabsTrigger>
             <TabsTrigger value="moves">Hareketler</TabsTrigger>
-            <TabsTrigger value="waste">Fire & sayım</TabsTrigger>
+            <TabsTrigger value="waste">Fire ve sayım</TabsTrigger>
           </TabsList>
           <div className="inline-actions">
             <Button variant="outline" onClick={() => open("move")}>
@@ -475,12 +476,12 @@ export default function Modules(p: ViewProps & { view: string }) {
                       (tab === "moves" || ["waste", "count"].includes(x.kind)),
                   )
                   .map((x) => [
-                    x.date,
+                    displayDate(x.date),
                     d.materials.find((m) => m.id === x.material_id)?.name,
                     branchName(d, x.branch_id),
                     {
                       opening: "Açılış",
-                      sale: "Reçete tüketimi",
+                      sale: "Tarife göre malzeme tüketimi",
                       sale_reversal: "Satış iadesi",
                       waste: "Fire",
                       count: "Sayım farkı",
@@ -488,7 +489,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                       purchase: "Teslimat",
                       transfer_in: "Transfer giriş",
                       transfer_out: "Transfer çıkış",
-                    }[x.kind as string] || x.kind,
+                    }[x.kind as string] || transactionLabel(x.kind),
                     num(x.quantity),
                     x.reason,
                   ])}
@@ -570,16 +571,16 @@ export default function Modules(p: ViewProps & { view: string }) {
             rows={d.ledger
               .filter((x) => branch === "all" || x.branch_id === branch)
               .map((x) => [
-                x.date,
+                displayDate(x.date),
                 d.accounts.find((a) => a.id === x.account_id)?.name,
                 branchName(d, x.branch_id),
-                x.kind,
+                transactionLabel(x.kind),
                 <span
                   className={x.amount_cents >= 0 ? "text-green" : "text-red"}
                 >
                   {exactMoney(x.amount_cents)}
                 </span>,
-                x.note,
+                noteLabel(x.note),
               ])}
           />
         </section>
@@ -794,7 +795,7 @@ export default function Modules(p: ViewProps & { view: string }) {
               ])}
             />
             <p className="panel-note">
-              Bu sürümde belge alanları manuel girilir; otomatik OCR henüz bağlı
+              Bu sürümde belge alanları manuel girilir; otomatik belge okuma henüz bağlı
               değildir.
             </p>
           </section>
@@ -807,7 +808,7 @@ export default function Modules(p: ViewProps & { view: string }) {
         <div className="section-toolbar">
           <TabsList>
             <TabsTrigger value="orders">Satın alma</TabsTrigger>
-            <TabsTrigger value="suppliers">Tedarikçi & cari</TabsTrigger>
+            <TabsTrigger value="suppliers">Tedarikçi ve cari</TabsTrigger>
           </TabsList>
           <div className="inline-actions">
             <Button variant="outline" onClick={() => open("supplier")}>
@@ -858,7 +859,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                   ],
                   next = steps[steps.indexOf(r.status) + 1];
                 return [
-                  r.date,
+                  displayDate(r.date),
                   r.name,
                   byKind(d, "supplier").find((s) => s.id === r.supplier_id)
                     ?.name,
@@ -973,7 +974,7 @@ export default function Modules(p: ViewProps & { view: string }) {
               title={
                 d.role === "Personel"
                   ? "Personel bilgilerim"
-                  : "Ekip & personel kartları"
+                  : "Ekip ve personel kartları"
               }
               sub="Personel kartındaki ücret, tek başına finansal gider oluşturmaz."
             />
@@ -993,7 +994,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                 </div>,
                 e.title,
                 branchName(d, e.branch_id),
-                e.start_date,
+                displayDate(e.start_date),
                 exactMoney(e.salary_cents),
                 <Pill tone="success">Aktif</Pill>,
               ])}
@@ -1030,10 +1031,10 @@ export default function Modules(p: ViewProps & { view: string }) {
               rows={scoped(p, "attendance")
                 .filter((e) => e.date >= m.r.start && e.date <= m.r.end)
                 .map((e) => [
-                  e.date,
+                  displayDate(e.date),
                   e.name,
                   branchName(d, e.branch_id),
-                  e.status,
+                  statusLabel(e.status),
                   num(e.hours),
                   num(e.planned),
                   num(e.extra),
@@ -1115,7 +1116,7 @@ export default function Modules(p: ViewProps & { view: string }) {
         <TabsContent value="tax">
           <section className="panel">
             <PanelHeading
-              title="Vergi & mali yükümlülükler"
+              title="Vergi ve mali yükümlülükler"
               sub="Tutar ve vadeler kullanıcı tarafından girilir; otomatik vergi hesabı yapılmaz."
             />
             <DataTable
@@ -1139,7 +1140,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                   branchName(d, e.branch_id),
                   e.category,
                   money(e.amount_cents),
-                  e.due_date,
+                  displayDate(e.due_date),
                   <Pill tone={e.status === "paid" ? "success" : "warning"}>
                     {e.status === "paid"
                       ? "Ödendi"
@@ -1176,7 +1177,7 @@ export default function Modules(p: ViewProps & { view: string }) {
           <TabsList>
             <TabsTrigger value="vehicles">Araçlar</TabsTrigger>
             <TabsTrigger value="fuel">Yakıt</TabsTrigger>
-            <TabsTrigger value="utilities">Enerji & sayaç</TabsTrigger>
+            <TabsTrigger value="utilities">Enerji ve sayaç</TabsTrigger>
           </TabsList>
           <div className="inline-actions">
             <Button variant="outline" onClick={() => open("utility")}>
@@ -1241,7 +1242,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                 "Tutar",
               ]}
               rows={scoped(p, "fuel").map((f) => [
-                f.date,
+                displayDate(f.date),
                 f.name,
                 num(f.liters),
                 num(f.km),
@@ -1254,7 +1255,7 @@ export default function Modules(p: ViewProps & { view: string }) {
         <TabsContent value="utilities">
           <section className="panel">
             <PanelHeading
-              title="Enerji & tüketim"
+              title="Enerji ve tüketim"
               sub="Sayaç farkı ve gerçek fatura tutarı."
             />
             <DataTable
@@ -1268,7 +1269,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                 "Fatura tutarı",
               ]}
               rows={scoped(p, "utility").map((e) => [
-                e.date,
+                displayDate(e.date),
                 branchName(d, e.branch_id),
                 e.kind,
                 num(e.first),
@@ -1296,7 +1297,7 @@ export default function Modules(p: ViewProps & { view: string }) {
             </p>
           </div>
           <Pill>
-            {m.r.start} → {m.r.end}
+            {displayDate(m.r.start)} → {displayDate(m.r.end)}
           </Pill>
         </div>
         <div className="report-grid">
@@ -1310,7 +1311,7 @@ export default function Modules(p: ViewProps & { view: string }) {
             ],
             [
               "expenses",
-              "Gider & fatura raporu",
+              "Gider ve fatura raporu",
               "Gider türü, vergi, vade ve ödeme durumu.",
               Wallet,
               "expenses",
@@ -1324,7 +1325,7 @@ export default function Modules(p: ViewProps & { view: string }) {
             ],
             [
               "ledger",
-              "Kasa & banka raporu",
+              "Kasa ve banka raporu",
               "Hesap hareketleri, tahsilat ve ters kayıtlar.",
               Wallet,
               "accounts",
@@ -1346,7 +1347,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                         open("login");
                         return;
                       }
-                      window.location.href = `/api/export?kind=${kind}&start=${m.r.start}&end=${m.r.end}&branch_id=${branch}`;
+                      window.location.href = `/api/export?kind=${kind}&start=${displayDate(m.r.start)}&end=${displayDate(m.r.end)}&branch_id=${branch}`;
                     }}
                   >
                     <FileDown size={16} />
@@ -1422,7 +1423,7 @@ export default function Modules(p: ViewProps & { view: string }) {
           </h1>
           <p>
             {branch === "all" ? "Tüm şubeler" : branchName(d, branch)} ·{" "}
-            {m.r.start} / {m.r.end}
+            {displayDate(m.r.start)} / {displayDate(m.r.end)}
           </p>
           {kind === "sales" ? (
             <DataTable
@@ -1435,12 +1436,12 @@ export default function Modules(p: ViewProps & { view: string }) {
                     x.date <= m.r.end,
                 )
                 .map((s) => [
-                  s.date,
+                  displayDate(s.date),
                   branchName(d, s.branch_id),
-                  s.channel,
+                  channelLabel(s.channel),
                   exactMoney(s.total_cents),
                   exactMoney(s.cost_cents),
-                  s.status,
+                  statusLabel(s.status),
                 ])}
             />
           ) : kind === "expenses" ? (
@@ -1454,12 +1455,12 @@ export default function Modules(p: ViewProps & { view: string }) {
                     x.date <= m.r.end,
                 )
                 .map((e) => [
-                  e.date,
+                  displayDate(e.date),
                   branchName(d, e.branch_id),
                   e.name,
                   exactMoney(e.amount_cents),
-                  e.due_date || "—",
-                  e.status,
+                  displayDate(e.due_date),
+                  statusLabel(e.status),
                 ])}
             />
           ) : kind === "inventory" ? (
@@ -1483,15 +1484,15 @@ export default function Modules(p: ViewProps & { view: string }) {
                     x.date <= m.r.end,
                 )
                 .map((l) => [
-                  l.date,
+                  displayDate(l.date),
                   d.accounts.find((a) => a.id === l.account_id)?.name,
                   exactMoney(l.amount_cents),
-                  l.note,
+                  noteLabel(l.note),
                 ])}
             />
           )}
           <footer>
-            Oluşturma tarihi: {today()} · Yalnızca kayıtlı veriler · RestoPusula
+            Oluşturma tarihi: {displayDate(today())} · Yalnızca kayıtlı veriler · RestoPusula
           </footer>
         </section>
       </div>
@@ -1503,7 +1504,7 @@ export default function Modules(p: ViewProps & { view: string }) {
         <div className="section-toolbar">
           <TabsList>
             <TabsTrigger value="company">İşletme</TabsTrigger>
-            <TabsTrigger value="users">Kullanıcı & yetkiler</TabsTrigger>
+            <TabsTrigger value="users">Kullanıcı ve yetkiler</TabsTrigger>
             <TabsTrigger value="audit">İşlem geçmişi</TabsTrigger>
             <TabsTrigger value="integrations">Entegrasyonlar</TabsTrigger>
           </TabsList>
@@ -1514,7 +1515,7 @@ export default function Modules(p: ViewProps & { view: string }) {
               <Store size={25} />
               <h2>{d.tenant?.name || "İşletme çalışma alanı"}</h2>
               <p>
-                {d.branches.length} şube · para birimi TRY · Türkiye saat dilimi
+                {d.branches.length} şube · Türk lirası (₺) · Türkiye saat dilimi
               </p>
               <Button variant="outline" onClick={() => open("company")}>
                 İşletme bilgileri
@@ -1554,8 +1555,8 @@ export default function Modules(p: ViewProps & { view: string }) {
         <TabsContent value="users">
           <section className="panel">
             <PanelHeading
-              title="Kullanıcılar & şube erişimi"
-              sub="İzinler sunucuda doğrulanır; şube sınırı tüm kayıtlara uygulanır."
+              title="Kullanıcılar ve şube erişimi"
+              sub="Her kullanıcı yalnızca yetkili olduğu şubelerin kayıtlarına erişir."
             >
               <Button onClick={() => open("member")}>
                 <Plus size={16} />
@@ -1567,7 +1568,7 @@ export default function Modules(p: ViewProps & { view: string }) {
               rows={d.members.map((u) => [
                 u.name,
                 u.email,
-                u.role,
+                roleLabel(u.role),
                 u.branch_id ? branchName(d, u.branch_id) : "Tüm şubeler",
                 <Pill tone={u.must_change ? "warning" : "success"}>
                   {u.must_change ? "Şifre değişmeli" : "Aktif"}
@@ -1589,8 +1590,8 @@ export default function Modules(p: ViewProps & { view: string }) {
                   timeZone: "Europe/Istanbul",
                 }),
                 a.user_name,
-                a.action,
-                a.description,
+                auditActionLabel(a.action),
+                auditDescription(a.description),
               ])}
             />
           </section>
@@ -1601,8 +1602,8 @@ export default function Modules(p: ViewProps & { view: string }) {
               "POS cihazları",
               "E-fatura / e-arşiv",
               "Banka bağlantısı",
-              "Online sipariş",
-              "OCR fatura okuma",
+              "İnternet siparişi",
+              "Otomatik fatura okuma",
               "Yapay zekâ sağlayıcısı",
             ].map((s) => (
               <section className="panel settings-card" key={s}>

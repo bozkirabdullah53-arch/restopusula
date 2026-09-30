@@ -1,0 +1,210 @@
+/* Restaurant workspace: warm paper, forest green and restrained copper. */
+:root {
+  --background: #f5f5ef; --foreground: #243c32; --card-foreground: #243c32;
+  --popover-foreground: #243c32; --primary: #aa4632; --primary-foreground: #fff;
+  --secondary: #eeefe7; --secondary-foreground: #294f3e; --muted: #f0f1e9;
+  --muted-foreground: #626e63; --accent: #edf0e7; --accent-foreground: #294f3e;
+  --border: #e0e4d9; --input: #d4dbce; --ring: #aa4632; --radius: 0.9rem;
+  --sidebar: #163a2c; --sidebar-foreground: #d6e0d2; --sidebar-primary: #e4c796;
+  --sidebar-accent: #284c3b; --sidebar-border: #355243;
+}
+body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--background); }
+.app-main { background: var(--background); }
+.mise-sidebar [data-slot="sidebar-inner"], [data-slot="sidebar"][data-mobile="true"] { background: linear-gradient(165deg, #193d2e, #102b21); }
+.brand-area { padding: 28px 22px 20px; gap: 24px; }
+.brand { gap: 11px; font-size: 1.35rem; letter-spacing: -0.045em; }
+.brand-icon { width: 39px; height: 42px; border-radius: 12px; color: #183d2d; background: #e5cd9d; }
+.brand small { color: #bdccb7; font-size: 0.64rem; letter-spacing: 0.1em; }
+.brand .orange { color: #e5cd9d; }
+.workspace-choice { background: #ffffff08; border-color: #ffffff20; padding: 12px 10px; }
+.workspace-choice small, .profile small { color: #b4c5ae; }
+.workspace-mark { background: #385842; color: #eee9d6; border-radius: 9px; }
+.mise-sidebar [data-slot="sidebar-group"] { padding: 5px 15px 11px; }
+.mise-sidebar [data-slot="sidebar-group-label"] { color: #aec2a8; font-size: 0.68rem; letter-spacing: 0.1em; }
+.nav-item { color: #d0ddca; height: 43px; font-size: 0.875rem; }
+.nav-item svg { color: #aec2a8; stroke-width: 1.7; }
+.nav-item:hover { background: #ffffff0c; color: white; }
+.nav-item[data-active="true"] { background: #f1eddf; color: #193d2c; box-shadow: 0 3px 12px #00000010; }
+.nav-item[data-active="true"] svg { color: #244e37; }
+.nav-indicator { left: -15px; background: #e5cd9d; }
+.assistant-nav { background: #2e4935 !important; color: #ecd6ac !important; border-color: #75836a !important; }
+.settings-nav { color: #d0ddca; }
+.profile { border-color: #ffffff21; }
+.avatar { color: #274733; background: #e5e7d6; }
+.topbar { height: 72px; background: #ffffffd9; border-color: #dfe4d7; }
+.breadcrumb { color: #687b6c; }
+.breadcrumb strong { color: #294735; }
+.icon-button, .search-button { color: #526f5b; }
+.icon-button:hover, .search-button:hover { background: #edf0e7; }
+.search-button kbd { color: #5e7263; border-color: #d8dfd1; }
+.notification-button > span { background: #aa4632; font-size: 0.68rem; }
+.top-avatar { background: #e1e8d9; color: #294735; box-shadow: 0 0 0 1px #d6dfce; }
+.page-content { max-width: 1680px; padding-top: 30px; }
+.page-heading { margin-bottom: 22px; }
+.page-heading h1 { font-size: clamp(1.65rem, 2.35vw, 2.1rem); color: #213d2d; font-weight: 650; }
+.page-heading p { color: #5e7464; line-height: 1.6; }
+.eyebrow { color: #526e57; font-size: 0.7rem; letter-spacing: 0.12em; }
+.orange { color: #aa4632; }
+.filterbar { flex-wrap: wrap; margin-bottom: 20px; }
+.filter-start { min-width: 0; }
+.sync-text { color: #667965; }
+.date-text { border-color: #d8dfd0; }
+.branch-picker, .period-picker { border-color: #d7ded0; border-radius: 9px; min-height: 39px; color: #344e3b; }
+.branch-picker > svg, .period-picker > svg { color: #5a795e; }
+.restaurant-banner { position: relative; overflow: hidden; min-height: 236px; isolation: isolate; border-radius: 18px; background: #162f23; margin-bottom: 23px; box-shadow: 0 8px 22px #17392312; }
+.restaurant-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
+.restaurant-banner::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #10291fea 0%, #10291fde 28%, #10291f68 61%, #10291f0f 100%); }
+.restaurant-banner-content { padding: 29px 32px 28px; max-width: 650px; }
+.restaurant-eyebrow { display: flex; align-items: center; gap: 8px; color: #ead9b6; font-size: 0.66rem; letter-spacing: 0.12em; font-weight: 600; }
+.restaurant-banner h2 { color: #fffbed; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 2.8vw, 2.65rem); line-height: 1.2; font-weight: 400; letter-spacing: -0.04em; margin-top: 12px; }
+.restaurant-banner p { color: #e5eadb; font-size: 0.875rem; line-height: 1.6; margin-top: 10px; }
+.restaurant-banner-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 19px; }
+.restaurant-banner-actions button { font-size: 0.8rem; min-height: 38px; border-radius: 8px; }
+.restaurant-banner .restaurant-primary { background: #eee0c1; color: #163a27; box-shadow: none; }
+.restaurant-banner .restaurant-primary:hover { background: #fff1d5; }
+.restaurant-banner .restaurant-secondary { border: 1px solid #ecedd15c; color: #f2eedc; background: #10291f6b; }
+.restaurant-banner .restaurant-secondary:hover { background: #ffffff1f; }
+.restaurant-scope { position: absolute; right: 22px; top: 21px; display: flex; align-items: center; gap: 7px; max-width: 40%; padding: 7px 11px; font-size: 0.75rem; color: #f2eddf; background: #0e281fd9; border: 1px solid #d7d7b746; border-radius: 30px; overflow-wrap: anywhere; }
+.module-intro { position: relative; isolation: isolate; overflow: hidden; min-height: 136px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border: 1px solid #dbe3d1; border-radius: 15px; margin-bottom: 22px; padding: 22px 29px; background: linear-gradient(110deg, #eef2e7, #f6f5ec); }
+.module-intro > div { max-width: 740px; padding-right: 16px; z-index: 1; }
+.module-eyebrow { display: block; color: #647855; letter-spacing: 0.15em; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px; }
+.module-intro h2 { font-size: 1.25rem; color: #294c34; font-weight: 600; letter-spacing: -0.025em; line-height: 1.4; }
+.module-intro p { color: #586d56; font-size: 0.82rem; line-height: 1.6; margin-top: 6px; }
+.module-illustration { width: 242px; height: 121px; flex: 0 0 242px; margin: -12px -18px -12px 0; }
+.setup-strip { border-color: #dce2d2; border-left-color: #9caa72; background: #fffef9; border-radius: 12px; }
+.setup-symbol { color: #45693d; background: #edf0df; }
+.setup-strip strong { color: #314e37; }
+.setup-strip p { color: #62745d; line-height: 1.55; }
+.setup-strip button { color: #365538; border-color: #c7d3bb; }
+.kpi-card { border-color: #e0e5d8; border-radius: 14px; box-shadow: 0 3px 14px #19392404; padding: 21px 20px 20px; }
+.kpi-label { color: #58705b; font-size: 0.82rem; font-weight: 550; }
+.kpi-label svg { color: #647d5d; background: #edf2e5; width: 32px; height: 32px; padding: 7px; border-radius: 9px; }
+.kpi-value { color: #203f2b; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 16px; }
+.kpi-sub { color: #687b65; line-height: 1.6; }
+.primary-kpi { border-color: #214b34; background: linear-gradient(125deg, #214b34, #173f2c); box-shadow: 0 5px 17px #1a3e2515; }
+.primary-kpi .kpi-label { color: #e0e8d3; }
+.primary-kpi .kpi-label svg { color: #e4ca95; background: #ffffff12; }
+.primary-kpi .kpi-sub { color: #c2d2b6; }
+.panel { border-color: #e0e5d8; border-radius: 14px; box-shadow: 0 3px 14px #19392403; }
+.panel-heading h2 { color: #2a4c33; font-size: 1rem; }
+.panel-heading p { color: #63765e; line-height: 1.6; }
+.panel [data-slot="table-head"] { background: #f8f9f3; color: #5c7257; border-color: #e3e8db; font-size: 0.78rem; font-weight: 600; }
+.panel [data-slot="table-cell"] { color: #304932; border-color: #e5e9de; }
+.panel [data-slot="table-row"]:hover { background: #f8f9f3; }
+.cell-sub, .section-toolbar > p, .branch-card > p { color: #62745b; }
+.chart-empty-content { background: #ffffffec; }
+.chart-empty-content strong { color: #4e6951; }
+.chart-empty-content p, .chart-footer, .chart-legend { color: #64765e; }
+.chart-empty-content button { color: #426442; border-color: #d4dec9; }
+.empty-icon { background: #edf2e4; color: #527248; }
+.orange-dot { background: #aa4632; }
+.gray-dot { background: #356f5b; }
+.important-intro, .important-empty p, .payment-empty p, .important-empty h3 { color: #60745b; }
+.important-empty > svg { color: #4e7045; background: #ecf2e4; }
+.sparkle-icon { color: #755939; background: #f1ead8; }
+.quick-links button { color: #4a6947; }
+.quick-links button:hover { color: #224b2d; background: #f2f5eb; }
+.balance-strip { border-color: #dfe5d7; border-radius: 12px; background: #fdfef9; }
+.balance-strip > div { border-color: #e0e7d8; }
+.balance-strip strong { color: #284d32; font-variant-numeric: tabular-nums; }
+.balance-strip > div > span, .balance-strip svg { color: #60765a; }
+.pill { border-radius: 6px; }
+.pill.neutral { color: #54684f; background: #f0f3e9; border-color: #dde5d3; }
+.pill.success { color: #345c39; background: #eaf2e4; border-color: #d6e4ce; }
+.pill.warning { color: #7b5b23; background: #fbf1dd; border-color: #eedaad; }
+.pill.danger { color: #923e2e; background: #fbeee7; border-color: #edd2c6; }
+.pill.info { color: #345c39; background: #eaf2e4; border: 1px solid #d6e4ce; }
+.branch-number, .product-symbol { background: #eaf1e1; color: #53734b; border-radius: 10px; }
+.account-card, .branch-card, .settings-card, .report-card { border-color: #dfe6d5; }
+.branch-card h2, .report-card h2, .settings-card h2 { color: #294e31; }
+.report-card > p, .settings-card p, .branch-card-bottom, .table-legend { color: #617659; }
+.report-intro { background: #f0f4e8; border-color: #d9e2cc; }
+.report-intro-icon { color: #577642; background: #e1ead4; }
+.table-card h3 { color: #3d6240; }
+.table-card-top small, .table-persons, .table-main > small { color: #587353; }
+.table-status-picker { color: #45623f !important; }
+.table-card { border-color: #d5e1cc; background: #f7faf2; }
+.table-card-top span { color: #547747; background: #e9f1e0; }
+.table-card.status-Dolu { border-color: #d8c4a3; background: #fcf6e9; }
+.table-card.status-Rezerve { border-color: #c8d3d8; background: #f0f5f7; }
+.cart-panel { border-color: #dce3d2; }
+[data-slot="dialog-content"], [data-slot="sheet-content"] { background: #fffef9; }
+[data-slot="dialog-content"] { max-height: 90dvh; overflow-y: auto; }
+[data-slot="dialog-close"], [data-slot="sheet-content"] > button:last-child { min-width: 36px; min-height: 36px; display: grid; place-items: center; }
+.form-field { color: #385938; }
+.form-help, .hint { color: #65755c; }
+.auth-symbol { background: #e6ecd9; color: #46683b; }
+.offline-preview-note { color: #5b6f56; border-color: #dce3d2; background: #fbfcf5; font-size: 0.8rem; }
+.page-footer, .calculation-note { color: #677760; }
+.calculation-note { align-items: flex-start; line-height: 1.7; }
+.section-toolbar { flex-wrap: wrap; gap: 12px; }
+.inline-actions { flex-wrap: wrap; }
+[data-slot="tabs-list"] { max-width: 100%; background: #ecefe4; }
+[data-slot="tabs-trigger"][data-state="active"] { color: #2d5533; background: #fffef8; }
+@media (max-width: 1100px) {
+  .module-intro { padding: 20px 23px; gap: 12px; }
+  .module-illustration { width: 190px; flex-basis: 190px; height: 100px; }
+  .module-intro h2 { font-size: 1.1rem; }
+  .restaurant-banner-content { max-width: 78%; padding: 27px 26px; }
+  .restaurant-scope { top: 17px; right: 17px; }
+}
+@media (max-width: 767px) {
+  .topbar { height: 64px; padding-inline: 15px; }
+  .page-content { padding: 22px 15px 18px; }
+  .page-heading { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .page-heading h1 { font-size: 1.65rem; }
+  .page-heading p { max-width: none; font-size: 0.82rem; }
+  .heading-actions { width: 100%; justify-content: flex-end; }
+  .heading-actions button { min-height: 40px; }
+  .restaurant-banner { min-height: 259px; border-radius: 14px; margin-bottom: 18px; }
+  .restaurant-banner-content { max-width: 100%; padding: 24px 21px 25px; }
+  .restaurant-banner::after { background: linear-gradient(90deg, #10291ff2, #10291fb8); }
+  .restaurant-eyebrow { font-size: 0.6rem; letter-spacing: 0.08em; }
+  .restaurant-banner h2 { font-size: 1.9rem; max-width: 275px; }
+  .restaurant-banner p { font-size: 0.82rem; }
+  .restaurant-banner-actions button { min-height: 42px; font-size: 0.78rem; padding: 0 12px; }
+  .restaurant-scope { position: static; margin: 0 21px 20px; width: fit-content; max-width: calc(100% - 42px); }
+  .module-intro { padding: 20px; min-height: 137px; margin-bottom: 18px; }
+  .module-intro > div { max-width: none; padding-right: 0; }
+  .module-intro h2 { font-size: 1.12rem; max-width: 280px; }
+  .module-intro p { max-width: 370px; font-size: 0.8rem; }
+  .module-illustration { position: absolute; right: -33px; bottom: -21px; width: 194px; height: 97px; opacity: 0.12; z-index: -1; }
+  .kpi-card { padding: 17px 14px; }
+  .kpi-label { font-size: 0.79rem; }
+  .kpi-label svg { width: 26px; height: 26px; padding: 5px; }
+  .kpi-value { font-size: 1.5rem; }
+  .kpi-sub { font-size: 0.73rem; }
+  .filter-start { width: 100%; }
+  .branch-picker, .period-picker { min-height: 40px; font-size: 0.79rem; }
+  .offline-preview-note { align-items: flex-start; line-height: 1.6; }
+  .offline-preview-note svg { flex-shrink: 0; margin-top: 3px; }
+  .panel-heading { flex-wrap: wrap; }
+  .panel-heading h2 { font-size: 0.95rem; }
+  .panel [data-slot="table-head"], .panel [data-slot="table-cell"] { font-size: 0.82rem; }
+  .section-toolbar .inline-actions { width: 100%; justify-content: flex-end; }
+  .section-toolbar button, .inline-actions button { min-height: 40px; }
+  .icon-button, .mobile-trigger, .search-button { width: 40px !important; height: 40px !important; }
+  .topbar-right { gap: 3px; }
+  .breadcrumb { min-width: 0; }
+  .breadcrumb strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 126px; }
+  [data-slot="dialog-close"], [data-slot="sheet-content"] > button:last-child { min-width: 42px; min-height: 42px; }
+}
+@media (max-width: 400px) {
+  .breadcrumb strong { max-width: 96px; font-size: 0.72rem; }
+  .topbar-right .icon-button[aria-label="Verileri yenile"] { display: none; }
+  .restaurant-banner h2 { font-size: 1.75rem; }
+  .kpi-label svg { display: none; }
+  .kpi-label { min-height: 26px; }
+}
+@media print {
+  .restaurant-banner, .module-intro, .offline-preview-note { display: none !important; }
+  body, .app-main { background: white !important; }
+  .panel { box-shadow: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .search-button > span, .search-button > kbd { display: none; }
+  .search-button { width: 36px; padding: 6px; justify-content: center; }
+  .module-intro > div { min-width: 0; }
+  .restaurant-scope { position: static; margin: 0 26px 20px; width: fit-content; max-width: calc(100% - 52px); }
+}
