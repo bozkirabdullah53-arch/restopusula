@@ -60,7 +60,9 @@ with tempfile.TemporaryDirectory() as data:
             })
             assert registration.ok, registration.text()
             page.goto('http://127.0.0.1:8937/?view=settings')
+            page.get_by_role('button', name='Menüyü aç veya kapat', exact=True).click()
             expect(page.locator('.profile small')).to_have_text('İşletme sahibi')
+            page.get_by_role('button', name='Ayarlar ve yetkiler', exact=True).click()
             page.get_by_role('tab', name='Kullanıcı ve yetkiler', exact=True).click()
             expect(page.get_by_role('cell', name='İşletme sahibi', exact=True)).to_be_visible()
 

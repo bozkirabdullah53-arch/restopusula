@@ -21,20 +21,6 @@ jobs:
       - name: Install frontend
         working-directory: frontend
         run: npm ci --no-audit --no-fund
-      - name: Prepare restaurant visual
-        run: |
-          python -m pip install Pillow
-          python - <<'PY'
-          import base64
-          from pathlib import Path
-          from PIL import Image
-          directory = Path('frontend/public/images')
-          target = directory / 'restaurant-interior.webp'
-          Image.open(directory / 'restaurant-interior.png').save(target, 'WEBP', quality=83, method=6)
-          encoded = base64.b64encode(target.read_bytes()).decode('ascii')
-          for index in range(0, len(encoded), 6000):
-              print(f'RWEBP:{index // 6000:04d}:' + encoded[index:index + 6000])
-          PY
       - name: Build frontend
         working-directory: frontend
         run: npm run build
@@ -56,7 +42,7 @@ jobs:
           python - <<'PY'
           import base64
           from pathlib import Path
-          for prefix, path in [('RPREVIEW', Path('Onizleme.html')), ('RSHOT', Path('ui-checks/dashboard-1440.jpg'))]:
+          for prefix, path in [('RPREVIEW', Path('Onizleme.html')), ('RSHOT', Path('ui-checks/dashboard-1440.jpg')), ('RDOCS', Path('docs/index.html')), ('RSHOTM', Path('ui-checks/dashboard-390.jpg')), ('RSHOTP', Path('ui-checks/products-1440.jpg'))]:
               if not path.exists():
                   continue
               encoded = base64.b64encode(path.read_bytes()).decode('ascii')
@@ -70,5 +56,6 @@ jobs:
           name: restopusula-preview
           path: |
             Onizleme.html
+            docs/index.html
             ui-checks/
           retention-days: 14

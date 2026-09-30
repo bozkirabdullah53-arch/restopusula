@@ -675,7 +675,7 @@ export default function Workspace() {
             <strong>{active?.name || title}</strong>
           </div>
           <div className="topbar-right">
-            <button className="search-button" onClick={() => setCommand(true)}>
+            <button className="search-button" aria-label="Panelde ara" onClick={() => setCommand(true)}>
               <Search size={17} />
               <span>Panelde ara</span>
               <kbd>Ctrl K</kbd>
@@ -700,6 +700,7 @@ export default function Workspace() {
                 className="top-avatar"
                 onClick={() => open("password")}
                 title="Şifre değiştir"
+                aria-label="Şifre değiştir"
               >
                 {auth.name.charAt(0)}
               </button>
@@ -1126,7 +1127,7 @@ export default function Workspace() {
           </form>
         </SheetContent>
       </Sheet>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-right" containerAriaLabel="Bildirimler" />
     </SidebarProvider>
   );
 }

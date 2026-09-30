@@ -8,6 +8,16 @@ Restoran zincirleri için Türkçe, web tabanlı bir yönetim paneli. React + Ty
 
 Başlangıçta işletme verisi bulunmaz. Göstergeler `—` gösterir; örnek ciro, sahte bakiye veya tahmini kâr eklenmez.
 
+## GitHub üzerinden paylaşılacak ön izleme
+
+**Canlı ön izleme:** [RestoPusula panelini aç](https://bozkirabdullah53-arch.github.io/restopusula-onizleme/)
+
+[Yayın deposu](https://github.com/bozkirabdullah53-arch/restopusula-onizleme), yalnızca derlenmiş `index.html` arayüzünü ve `.nojekyll` dosyasını içerir. Ana uygulama deposu gizlidir. Ön izleme gerçek arayüzdür; modüller gezilebilir, kayıt, hesap oluşturma ve ödeme işlemleri kapalıdır. Veritabanı veya gerçek işletme verisi yayın dosyalarına eklenmez.
+
+GitHub Pages, `restopusula-onizleme` deposunda **Deploy from a branch → main → / (root)** kaynağından yayınlanır. İlk yayın başarıyla tamamlandı.
+
+Arayüz değişikliklerinden sonra `frontend` içinde `npm run build`, proje kökünde `python scripts/make_preview.py` çalıştırın. Oluşan `docs/index.html` ve `docs/.nojekyll` dosyalarını ön izleme deposunun kökünde güncelleyin. Ön izleme deposuna kaydedilen değişiklikler Pages tarafından yeniden yayınlanır.
+
 ## Windows'ta kurulum
 
 Python **3.11 veya üzeri** (Python Launcher dahil) ve Node.js **22.13 veya üzeri** gerekir. İlk kurulum paket indirmek için internet kullanır.
