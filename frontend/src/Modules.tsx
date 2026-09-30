@@ -491,7 +491,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                       transfer_out: "Transfer çıkış",
                     }[x.kind as string] || transactionLabel(x.kind),
                     num(x.quantity),
-                    x.reason,
+                    noteLabel(x.reason),
                   ])}
               />
             </section>
@@ -1347,7 +1347,7 @@ export default function Modules(p: ViewProps & { view: string }) {
                         open("login");
                         return;
                       }
-                      window.location.href = `/api/export?kind=${kind}&start=${displayDate(m.r.start)}&end=${displayDate(m.r.end)}&branch_id=${branch}`;
+                      window.location.href = `/api/export?kind=${kind}&start=${m.r.start}&end=${m.r.end}&branch_id=${branch}`;
                     }}
                   >
                     <FileDown size={16} />
