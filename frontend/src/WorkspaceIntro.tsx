@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { ArrowUpRight, Compass, Store } from "lucide-react";
+import { useId, useState } from "react";
+import { ArrowUpRight, Compass, Store, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppData, branchName } from "@/lib/domain";
 
@@ -108,8 +108,10 @@ function Illustration({ scene }: { scene: Scene }) {
 }
 export default function WorkspaceIntro({ view, d, branch, go }: { view: string; d: AppData; branch: string; go: (view: string) => void; }) {
   const titleId = useId();
+  const [dismissed, setDismissed] = useState(() => window.localStorage.getItem("restopusula-setup-dismissed") === "1");
   const canView = (module: string) => !d.user || Boolean(d.user.permissions?.[module]?.view);
   if (view === "dashboard") return (
+    <>
     <section className="restaurant-banner" aria-labelledby={titleId}>
       <img className="restaurant-photo" src="/images/restaurant-interior.webp" width={2172} height={724} alt="" fetchPriority="high" />
       <div className="restaurant-banner-content">
@@ -123,6 +125,10 @@ export default function WorkspaceIntro({ view, d, branch, go }: { view: string; 
       </div>
       <span className="restaurant-scope"><Store size={14} />{branch === "all" ? "Tüm şubeler" : branchName(d, branch)}</span>
     </section>
+    {d.tenant && !dismissed && (
+      <SetupGuide d={d} go={go} canView={canView} onDismiss={() => { window.localStorage.setItem("restopusula-setup-dismissed", "1"); setDismissed(true); }} />
+    )}
+    </>
   );
   const section = sections[view];
   if (!section) return null;
@@ -130,6 +136,33 @@ export default function WorkspaceIntro({ view, d, branch, go }: { view: string; 
     <section className={"module-intro scene-" + section.scene} aria-labelledby={titleId}>
       <div><span className="module-eyebrow">RESTOPUSULA</span><h2 id={titleId}>{section.title}</h2><p>{section.text}</p></div>
       <Illustration scene={section.scene} />
+    </section>
+  );
+}
+
+function SetupGuide({ d, go, canView, onDismiss }: { d: AppData; go: (view: string) => void; canView: (module: string) => boolean; onDismiss: () => void }) {
+  const steps = [
+    { title: "İlk şubenizi ekleyin", detail: "Satış ve stok kayıtları bir şubeye bağlanır.", module: "branches", done: d.branches.length > 0 },
+    { title: "Tahsilat hesabı oluşturun", detail: "Nakit, banka veya POS hesabınızı seçin.", module: "accounts", done: d.accounts.length > 0 },
+    { title: "Menünüzü ve tarifinizi tanımlayın", detail: "Ürün ve malzemeler satış maliyetini hesaplar.", module: "products", done: d.products.length > 0 && d.materials.length > 0 },
+    { title: "İlk satışınızı kaydedin", detail: "Masa veya hızlı satış ekranından başlayın.", module: "sales", done: d.sales.length > 0 },
+  ];
+  const visible = steps.filter((step) => canView(step.module));
+  const complete = visible.filter((step) => step.done).length;
+  const next = visible.find((step) => !step.done);
+  if (!next) return null;
+  return (
+    <section className="setup-guide" aria-label="İlk kurulum adımları">
+      <div className="setup-guide-head">
+        <div><span className="setup-guide-kicker">HIZLI BAŞLANGIÇ</span><h2>İşletmenizi 4 adımda hazırlayın</h2><p>Her adım sizi doğrudan ilgili ekrana götürür. İstediğiniz zaman devam edebilirsiniz.</p></div>
+        <button className="setup-guide-dismiss" onClick={onDismiss} aria-label="Kurulum rehberini kapat"><X size={18} /></button>
+      </div>
+      <div className="setup-guide-progress" aria-label={`Kurulum ${complete} / ${visible.length} adım tamamlandı`}><span style={{ width: `${visible.length ? (complete / visible.length) * 100 : 0}%` }} /></div>
+      <div className="setup-guide-steps">
+        {visible.map((step, index) => <button key={step.module} className={`setup-guide-step ${step.done ? "is-done" : step === next ? "is-next" : ""}`} onClick={() => go(step.module)}>
+          <span className="setup-guide-number">{step.done ? "✓" : index + 1}</span><span className="setup-guide-copy"><strong>{step.title}</strong><small>{step.detail}</small></span><span className="setup-guide-state">{step.done ? "Tamamlandı" : step === next ? "Şimdi başla" : "Sırada"}</span>
+        </button>)}
+      </div>
     </section>
   );
 }
