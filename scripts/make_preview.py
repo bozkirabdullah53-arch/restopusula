@@ -41,6 +41,7 @@ web_page = page.replace(
 (pages / ".nojekyll").write_text("", encoding="utf-8")
 shutil.copy2(dist / 'manifest.webmanifest', pages / 'manifest.webmanifest')
 shutil.copytree(dist / 'icons', pages / 'icons', dirs_exist_ok=True)
+shutil.copytree(dist / 'images', pages / 'images', dirs_exist_ok=True)
 if (dist / 'favicon.svg').is_file():
     shutil.copy2(dist / 'favicon.svg', pages / 'favicon.svg')
 print('GitHub Pages yayın klasörü hazır:', pages)

@@ -41,6 +41,7 @@ jobs:
           cp docs/index.html _site/index.html
           cp docs/.nojekyll _site/.nojekyll
           cp -R docs/icons _site/icons
+          cp -R docs/images _site/images
           cp docs/manifest.webmanifest _site/manifest.webmanifest
           cp docs/favicon.svg _site/favicon.svg
       - uses: actions/upload-pages-artifact@v3
