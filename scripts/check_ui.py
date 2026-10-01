@@ -8,7 +8,7 @@ output = root / 'ui-checks'
 output.mkdir(exist_ok=True)
 errors = []
 results = []
-forbidden = re.compile(r'reçet|restaurant os|toggle sidebar|\b(?:completed|pending|reversed|sale_reversal|expense_reversal)\b', re.I)
+forbidden = re.compile(r'reçet|restaurant os|toggle sidebar|\b(?:completed|pending|reversed|sale_reversal|expense_reversal|ai_connection|ai_test)\b', re.I)
 
 def check_page(page, view, width):
     expect(page.locator('.page-heading h1')).to_be_visible()
@@ -21,7 +21,7 @@ def check_page(page, view, width):
     results.append({'view': view, 'width': width, 'page_width': dimensions['page']})
 
 with tempfile.TemporaryDirectory() as data:
-    env = dict(os.environ, MISE_DATA_DIR=data)
+    env = dict(os.environ, MISE_DATA_DIR=data, MISE_ALLOWED_ORIGINS='http://127.0.0.1:8937')
     log = (output / 'server.log').open('w', encoding='utf-8')
     server = subprocess.Popen([sys.executable, '-m', 'uvicorn', 'app.main:app', '--app-dir', 'backend', '--host', '127.0.0.1', '--port', '8937'], cwd=root, env=env, stdout=log, stderr=log)
     try:
@@ -96,6 +96,10 @@ with tempfile.TemporaryDirectory() as data:
             page.get_by_role('button', name='Evet, kaldır', exact=True).click()
             expect(page.locator('.ai-feedback')).to_contain_text('Bağlantı kaldırıldı')
             assert page.request.get('http://127.0.0.1:8937/api/ai-connection').json()['connection'] is None
+            page.goto('http://127.0.0.1:8937/?view=settings')
+            page.get_by_role('tab', name='İşlem geçmişi', exact=True).click()
+            expect(page.get_by_role('cell', name='Yapay zekâ bağlantısı', exact=True).first).to_be_visible()
+            check_page(page, 'settings-ai-audit', 360)
 
             # Authenticated Excel download must keep ISO dates in API requests.
             page.goto('http://127.0.0.1:8937/?view=reports')

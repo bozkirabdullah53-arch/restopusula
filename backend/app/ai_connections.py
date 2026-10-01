@@ -3,13 +3,14 @@ import json
 import os
 import re
 import threading
+from typing import Any
 
 import httpx
 from cryptography.fernet import Fernet, InvalidToken
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Body, HTTPException, Request
 
 from . import database
-from .database import audit, connect, now, one, uid
+from .database import audit, connect, now, one, rows, uid
 from .security import authenticate, rate_limit, require_permission
 
 router = APIRouter(prefix='/api/ai-connection')
@@ -56,19 +57,33 @@ def cipher(c, create=False):
                         handle.write(Fernet.generate_key())
                         handle.flush()
                         os.fsync(handle.fileno())
-            return Fernet(path.read_bytes())
+            encryption = Fernet(path.read_bytes())
+            if create:
+                validate_master_key(c, encryption)
+            return encryption
     except (OSError, ValueError):
         raise HTTPException(503, 'Şifreleme anahtarı okunamadı. Sunucu yedeğini kontrol edin.') from None
 
 
-def decrypt(c, connection):
+def decode_secret(encryption, connection):
     try:
-        payload = json.loads(cipher(c).decrypt(connection['encrypted_api_key'].encode()))
-        if payload['tenant_id'] != connection['tenant_id']:
+        payload = json.loads(encryption.decrypt(connection['encrypted_api_key'].encode()))
+        if payload['tenant_id'] != connection['tenant_id'] or not isinstance(payload['api_key'], str) or not payload['api_key']:
             raise ValueError('Tenant mismatch')
         return payload['api_key']
     except (InvalidToken, ValueError, KeyError, TypeError):
         raise HTTPException(503, 'Kayıtlı anahtar çözülemedi. Sunucu yedeğini kontrol edin.') from None
+
+
+def validate_master_key(c, encryption):
+    # A correctly encoded Fernet key can still be the wrong key. Authenticate
+    # it against stored credentials before allowing any replacement or backup.
+    for connection in rows(c, 'SELECT * FROM ai_connections'):
+        decode_secret(encryption, connection)
+
+
+def decrypt(c, connection):
+    return decode_secret(cipher(c), connection)
 
 
 def fields(payload):
@@ -95,10 +110,12 @@ def get_connection(request: Request):
 
 
 @router.post('')
-def save_connection(payload: dict, request: Request):
+def save_connection(request: Request, payload: Any = Body(None)):
     with connect() as c:
         c.execute('BEGIN IMMEDIATE')
         user = owner(c, request, True)
+        if not isinstance(payload, dict):
+            raise HTTPException(400, 'Bağlantı bilgilerini geçerli bir JSON nesnesi olarak gönderin.')
         provider, model, key = fields(payload)
         old = stored(c, user['tenant_id'])
         if not key and (not old or old['provider'] != provider):

@@ -1,4 +1,5 @@
 import json
+import base64
 import os
 import sqlite3
 import subprocess
@@ -84,6 +85,9 @@ class AIConnections(unittest.TestCase):
             self.assertEqual(anonymous.get('/api/ai-connection').status_code, 401)
         for path in ['/api/ai-connection', '/api/ai-connection/test', '/api/ai-connection/remove']:
             self.assertEqual(self.client.post(path, json=self.payload).status_code, 403)
+        self.assertEqual(self.client.post('/api/ai-connection', json=self.payload, headers={
+            'X-CSRF-Token': self.csrf, 'Origin': 'https://outside.example.test',
+        }).status_code, 403)
         with database.connect() as c:
             c.execute('UPDATE users SET role=?, permissions=? WHERE id=?',
                       ('Genel Müdür', json.dumps({'settings': {'view': True, 'edit': True}}), self.user_id))
@@ -132,6 +136,18 @@ class AIConnections(unittest.TestCase):
             self.assertEqual(response.status_code, 400, (values, response.text))
         self.assertIsNone(self.connection())
         self.assertFalse((database.DATA_DIR / 'ai-secret.key').exists())
+
+    def test_invalid_request_shapes_do_not_echo_credentials(self):
+        for body in [[{'api_key': self.key}], self.key, None]:
+            response = self.client.post('/api/ai-connection', json=body,
+                                        headers={'X-CSRF-Token': self.csrf})
+            self.assertGreaterEqual(response.status_code, 400)
+            self.assertNotIn(self.key, response.text)
+        response = self.client.post('/api/ai-connection',
+                                    content=json.dumps({'api_key': self.key}) + 'trailing',
+                                    headers={'X-CSRF-Token': self.csrf, 'Content-Type': 'application/json'})
+        self.assertGreaterEqual(response.status_code, 400)
+        self.assertNotIn(self.key, response.text)
 
     def test_provider_tests_use_fixed_metadata_endpoints_and_auth_headers(self):
         cases = [
@@ -211,6 +227,52 @@ class AIConnections(unittest.TestCase):
         self.assertEqual(self.post('/api/ai-connection/remove').status_code, 200)
         self.assertIsNone(self.connection())
         self.assertEqual(self.post('/api/ai-connection/test').status_code, 404)
+
+    def corrupt_master_key(self):
+        path = database.DATA_DIR / 'ai-secret.key'
+        decoded = bytearray(base64.urlsafe_b64decode(path.read_bytes()))
+        decoded[0] ^= 1
+        path.write_bytes(base64.urlsafe_b64encode(decoded))
+
+    def test_valid_format_wrong_master_key_cannot_overwrite_connection(self):
+        self.save()
+        with database.connect() as c:
+            previous = c.execute('SELECT encrypted_api_key FROM ai_connections').fetchone()[0]
+        self.corrupt_master_key()
+        response = self.post(payload={**self.payload, 'api_key': 'new-test-key-123456789'})
+        self.assertEqual(response.status_code, 503, response.text)
+        with database.connect() as c:
+            self.assertEqual(c.execute('SELECT encrypted_api_key FROM ai_connections').fetchone()[0], previous)
+
+    def test_new_tenant_cannot_save_using_mismatched_master_key(self):
+        self.save()
+        self.corrupt_master_key()
+        with TestClient(app) as other:
+            auth = other.post('/api/auth/register', json={
+                'name': 'Other owner', 'company': 'Other tenant',
+                'email': 'new-tenant-ai@example.test', 'password': 'OtherPass123!',
+            }).json()
+            response = self.post(payload=self.payload, client=other, csrf=auth['csrf'])
+            self.assertEqual(response.status_code, 503, response.text)
+            self.assertIsNone(other.get('/api/ai-connection').json()['connection'])
+
+    def test_backup_rejects_corrupt_or_mismatched_encryption_keys(self):
+        self.save()
+        root = Path(__file__).resolve().parents[2]
+        path = database.DATA_DIR / 'ai-secret.key'
+        original = path.read_bytes()
+        for valid_format in [False, True]:
+            with self.subTest(valid_format=valid_format):
+                path.write_bytes(original)
+                if valid_format:
+                    self.corrupt_master_key()
+                else:
+                    path.write_bytes(b'corrupt')
+                result = subprocess.run([sys.executable, 'backend/backup.py'], cwd=root,
+                                        env={**os.environ, 'MISE_DATA_DIR': str(database.DATA_DIR)},
+                                        capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(list((database.DATA_DIR / 'backups').glob('*.zip')), [])
 
     def test_local_backup_can_restore_encrypted_connection(self):
         self.save()

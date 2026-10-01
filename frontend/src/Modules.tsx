@@ -49,6 +49,7 @@ import {
 } from "@/lib/domain";
 import { Blank, Pill, Metric, PanelHeading } from "./Dashboard";
 import Sales from "./Sales";
+import AISettings from "./AISettings";
 import { statusLabel, roleLabel, channelLabel, transactionLabel, auditActionLabel, auditDescription, noteLabel, displayDate } from "@/lib/presentation";
 
 export type ViewProps = {
@@ -109,10 +110,11 @@ const scoped = (p: ViewProps, k: string) =>
     (e) =>
       p.branch === "all" || e.branch_id === p.branch || e.branch_id === null,
   );
-export default function Modules(p: ViewProps & { view: string }) {
+export default function Modules(p: ViewProps & { view: string; request: (path: string, body?: Row) => Promise<Row>; preview: boolean }) {
   const { view, d, branch, open, act, go } = p,
     m = metrics(d, branch, p.period, p.start, p.end),
     [query, setQuery] = useState("");
+  const [settingsTab, setSettingsTab] = useState(new URLSearchParams(window.location.search).get("tab") === "ai" ? "ai" : "company");
   const filter = (a: Row[]) =>
     a.filter((r) =>
       String(r.name)
@@ -1500,13 +1502,14 @@ export default function Modules(p: ViewProps & { view: string }) {
   }
   if (view === "settings")
     return (
-      <Tabs defaultValue="company">
+      <Tabs value={settingsTab} onValueChange={setSettingsTab} className="settings-tabs">
         <div className="section-toolbar">
           <TabsList>
             <TabsTrigger value="company">İşletme</TabsTrigger>
             <TabsTrigger value="users">Kullanıcı ve yetkiler</TabsTrigger>
             <TabsTrigger value="audit">İşlem geçmişi</TabsTrigger>
             <TabsTrigger value="integrations">Entegrasyonlar</TabsTrigger>
+            <TabsTrigger value="ai">Yapay zekâ</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="company">
@@ -1598,13 +1601,18 @@ export default function Modules(p: ViewProps & { view: string }) {
         </TabsContent>
         <TabsContent value="integrations">
           <div className="integration-grid">
+            <section className="panel settings-card">
+              <Plug size={24} />
+              <h2>Yapay zekâ sağlayıcısı</h2>
+              <p>Sağlayıcı, model ve API anahtarını ekleyin; bağlantınızı test edin.</p>
+              <Button variant="outline" onClick={() => setSettingsTab("ai")}>AI bağlantısı ekle</Button>
+            </section>
             {[
               "POS cihazları",
               "E-fatura / e-arşiv",
               "Banka bağlantısı",
               "İnternet siparişi",
               "Otomatik fatura okuma",
-              "Yapay zekâ sağlayıcısı",
             ].map((s) => (
               <section className="panel settings-card" key={s}>
                 <Plug size={24} />
@@ -1617,6 +1625,9 @@ export default function Modules(p: ViewProps & { view: string }) {
               </section>
             ))}
           </div>
+        </TabsContent>
+        <TabsContent value="ai">
+          <AISettings request={p.request} preview={p.preview} owner={d.user?.role === "Patron"} />
         </TabsContent>
       </Tabs>
     );

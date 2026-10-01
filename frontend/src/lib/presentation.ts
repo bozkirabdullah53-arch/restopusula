@@ -24,6 +24,7 @@ const actions: Record<string, string> = {
   employee: "Personel kaydı", attendance: "Puantaj", budget: "Bütçe",
   tax: "Mali yükümlülük", vehicle: "Araç kaydı", fuel: "Yakıt",
   utility: "Enerji faturası", member: "Kullanıcı kaydı",
+  ai_connection: "Yapay zekâ bağlantısı", ai_test: "Yapay zekâ bağlantı testi",
 };
 export const statusLabel = (value: string) => statuses[value] ?? value;
 export const transactionLabel = (value: string) => transactions[value] ?? value;

@@ -43,10 +43,13 @@ Sunucu penceresi açık kaldığı sürece uygulama çalışır. Kapatmak için 
 - PDF/PNG/JPEG belge yükleme; dört Excel `.xlsx` raporu ve tarayıcı üzerinden PDF/yazdırma ekranları.
 - İşlem geçmişi, işletme bazında JSON dışa aktarım ve yerel veritabanı/belge yedeği.
 - Kayıtlı verilerle çalışan kural tabanlı yönetim asistanı; eksik veride hesaplama yapılmaz.
+- Ayarlar → Yapay zekâ bölümünde OpenAI, Gemini veya Claude bağlantısı ekleme, model erişimini test etme ve bağlantıyı kaldırma. Yalnızca Patron yönetebilir; API anahtarı sunucuda şifreli tutulur.
 
 ## Kapsam ve hesaplama
 
-Bu ilk sürüm, tüm ayrıntılı ticari gereksinimlerin tamamlandığı anlamına gelmez. POS cihazı, banka, online sipariş, e-fatura/e-arşiv, OCR ve dil modeli servisleri **bağlı değildir**. Entegrasyon ekranları bu durumu açıkça gösterir. Otomatik bordro/mevzuat hesabı, ayrıntılı muhasebe defteri, otomatik vergi beyanı ve yedekten geri yükleme arayüzü yoktur.
+Bu ilk sürüm, tüm ayrıntılı ticari gereksinimlerin tamamlandığı anlamına gelmez. POS cihazı, banka, online sipariş, e-fatura/e-arşiv ve OCR servisleri **bağlı değildir**. Yapay zekâ ayarları sağlayıcı anahtarını kaydeder ve seçilen modele erişimi test eder; yönetim asistanı kural tabanlı çalışır. Otomatik bordro/mevzuat hesabı, ayrıntılı muhasebe defteri, otomatik vergi beyanı ve yedekten geri yükleme arayüzü yoktur.
+
+AI bağlantısı için Patron hesabıyla **Ayarlar → Yapay zekâ** bölümünü açın. Sağlayıcı ve model kimliğini seçip sağlayıcınızdan aldığınız API anahtarını kaydedin; ardından **Bağlantıyı test et** düğmesini kullanın. Test yalnızca model bilgisini sorgular; içerik üretmez ve işletme kayıtlarını göndermez. Anahtar boş bırakıldığında mevcut sağlayıcının anahtarı korunur; sağlayıcı değiştirildiğinde yeni anahtar gerekir. Ön izlemede anahtar girişi ve bağlantı işlemleri kapalıdır.
 
 Kayıtlı işletme sonucu = KDV hariç kayıtlı satış − satış anındaki tarif maliyeti − KDV hariç işletme gideri. Ürün tarifi veya maliyet eksikse sonuç hesaplanmaz. Tedarikçi alış faturası, tarif maliyetiyle aynı gideri ikinci kez saymamak için işletme giderine eklenmez. Bu gösterge kayıt dışındaki giderleri ve vergi sonrası muhasebe kârını kapsamaz. Stok maliyeti malzeme bazında ağırlıklı ortalamadır; şube bazında ayrı maliyet katmanları bulunmaz. Puantaj saatleri manuel kayıtlardır, yasal bordro hesabı değildir.
 
@@ -54,7 +57,9 @@ Kayıtlı işletme sonucu = KDV hariç kayıtlı satış − satış anındaki t
 
 ## Veri ve yedek
 
-Yerel veri `backend/data` altında tutulur ve Git'e gönderilmez. **Yedekle.cmd**, `backend/data/backups` içine veritabanı ve belgeleri içeren ZIP yedeği oluşturur. Yönetici panelindeki JSON dışa aktarımı işletme kayıtlarını içerir; parola/oturum bilgilerini ve belge dosyalarını içermez. ZIP yedeğini geri almak için sunucuyu durdurup arşivdeki veritabanını ve `documents` klasörünü veri dizinine yerleştirin. Tüm yerel ZIP yedeği, aynı sunucudaki işletmeleri kapsar; işletme sahibine gönderilecek dışa aktarım için paneldeki işletme bazlı JSON kullanılır.
+Yerel veri `backend/data` altında tutulur ve Git'e gönderilmez. **Yedekle.cmd**, `backend/data/backups` içine veritabanı ve belgeleri içeren ZIP yedeği oluşturur. Yönetici panelindeki JSON dışa aktarımı işletme kayıtlarını içerir; parola/oturum bilgilerini ve belge dosyalarını içermez. ZIP yedeğini geri almak için sunucuyu durdurun. Arşivdeki `restopusula.sqlite3` dosyasını **`mise.sqlite3` olarak yeniden adlandırıp** veri dizinindeki veritabanının yerine koyun; `documents` klasörünü de aynı veri dizinine yerleştirin. Tüm yerel ZIP yedeği, aynı sunucudaki işletmeleri kapsar; işletme sahibine gönderilecek dışa aktarım için paneldeki işletme bazlı JSON kullanılır.
+
+AI anahtarları için veri dizininde `ai-secret.key` şifreleme dosyası oluşturulur. Bu dosya yerel yönetici ZIP yedeğine eklenir; geri yüklemede veritabanıyla birlikte aynı veri dizinine yerleştirin. Yerel ZIP, anahtarların çözülebilmesi için gereken şifreleme dosyasını da içerdiğinden özel tutulmalıdır. İşletme JSON dışa aktarımı AI anahtarlarını ve bu dosyayı içermez. Eksik veya bozuk şifreleme dosyası otomatik olarak değiştirilmez.
 
 ## Geliştirme
 
