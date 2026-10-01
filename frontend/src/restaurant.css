@@ -7,8 +7,13 @@
   --border: #e0e4d9; --input: #d4dbce; --ring: #aa4632; --radius: 0.9rem;
   --sidebar: #163a2c; --sidebar-foreground: #d6e0d2; --sidebar-primary: #e4c796;
   --sidebar-accent: #284c3b; --sidebar-border: #355243;
+  --display-font: Georgia, "Times New Roman", serif;
+  --ui-font: "Segoe UI", "Inter", Arial, sans-serif;
+  --premium-shadow: 0 14px 38px #1939240b;
 }
-body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--background); }
+body { font-family: var(--ui-font); background: var(--background); }
+button, input, select, textarea { font-family: inherit; }
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 3px solid #c39a58; outline-offset: 3px; }
 .app-main { background: var(--background); }
 .mise-sidebar [data-slot="sidebar-inner"], [data-slot="sidebar"][data-mobile="true"] { background: linear-gradient(165deg, #193d2e, #102b21); }
 .brand-area { padding: 28px 22px 20px; gap: 24px; }
@@ -51,12 +56,12 @@ body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--ba
 .date-text { border-color: #d8dfd0; }
 .branch-picker, .period-picker { border-color: #d7ded0; border-radius: 9px; min-height: 39px; color: #344e3b; }
 .branch-picker > svg, .period-picker > svg { color: #5a795e; }
-.restaurant-banner { position: relative; overflow: hidden; min-height: 236px; isolation: isolate; border-radius: 18px; background: #162f23; margin-bottom: 23px; box-shadow: 0 8px 22px #17392312; }
+.restaurant-banner { position: relative; overflow: hidden; min-height: 236px; isolation: isolate; border-radius: 18px; background: #162f23; margin-bottom: 23px; box-shadow: var(--premium-shadow); }
 .restaurant-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
 .restaurant-banner::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #10291fea 0%, #10291fde 28%, #10291f68 61%, #10291f0f 100%); }
 .restaurant-banner-content { padding: 29px 32px 28px; max-width: 650px; }
 .restaurant-eyebrow { display: flex; align-items: center; gap: 8px; color: #ead9b6; font-size: 0.66rem; letter-spacing: 0.12em; font-weight: 600; }
-.restaurant-banner h2 { color: #fffbed; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 2.8vw, 2.65rem); line-height: 1.2; font-weight: 400; letter-spacing: -0.04em; margin-top: 12px; }
+.restaurant-banner h2 { color: #fffbed; font-family: var(--display-font); font-size: clamp(1.7rem, 2.8vw, 2.65rem); line-height: 1.2; font-weight: 400; letter-spacing: -0.04em; margin-top: 12px; }
 .restaurant-banner p { color: #e5eadb; font-size: 0.875rem; line-height: 1.6; margin-top: 10px; }
 .restaurant-banner-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 19px; }
 .restaurant-banner-actions button { font-size: 0.8rem; min-height: 38px; border-radius: 8px; }
@@ -97,7 +102,8 @@ body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--ba
 .setup-guide-step.is-next { background: #f5f4e9; }
 .setup-guide-step.is-next .setup-guide-number { color: white; background: #365c3d; }
 .setup-guide-step.is-next .setup-guide-state { color: #426744; font-weight: 650; }
-.kpi-card { border-color: #e0e5d8; border-radius: 14px; box-shadow: 0 3px 14px #19392404; padding: 21px 20px 20px; }
+.kpi-card { border-color: #e0e5d8; border-radius: 14px; box-shadow: 0 3px 14px #19392404; padding: 21px 20px 20px; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.kpi-card:hover { transform: translateY(-2px); border-color: #cbd8c2; box-shadow: 0 10px 24px #19392410; }
 .kpi-label { color: #58705b; font-size: 0.82rem; font-weight: 550; }
 .kpi-label svg { color: #647d5d; background: #edf2e5; width: 32px; height: 32px; padding: 7px; border-radius: 9px; }
 .kpi-value { color: #203f2b; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 16px; }
@@ -189,6 +195,11 @@ body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--ba
   .restaurant-banner p { font-size: 0.82rem; }
   .restaurant-banner-actions button { min-height: 42px; font-size: 0.78rem; padding: 0 12px; }
   .restaurant-scope { position: static; margin: 0 21px 20px; width: fit-content; max-width: calc(100% - 42px); }
+  .restaurant-banner { min-height: 226px; }
+  .restaurant-banner-content { padding-top: 20px; }
+  .restaurant-banner h2 { font-size: 1.72rem; }
+  .restaurant-banner p { margin-top: 7px; }
+  .restaurant-banner-actions { margin-top: 13px; }
   .module-intro { padding: 20px; min-height: 137px; margin-bottom: 18px; }
   .module-intro > div { max-width: none; padding-right: 0; }
   .module-intro h2 { font-size: 1.12rem; max-width: 280px; }
@@ -225,6 +236,9 @@ body { font-family: "Segoe UI", "Inter", Arial, sans-serif; background: var(--ba
   .restaurant-banner, .module-intro, .offline-preview-note { display: none !important; }
   body, .app-main { background: white !important; }
   .panel { box-shadow: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 
 @media (min-width: 768px) and (max-width: 1100px) {

@@ -771,7 +771,7 @@ export default function Workspace() {
               </DropdownMenu>
             </div>
           </div>
-          <InstallApp />
+          {!offlinePreview && <InstallApp />}
           <WorkspaceIntro view={view} d={d} branch={branch} go={go} />
           <div className="filterbar">
             <div className="filter-start">

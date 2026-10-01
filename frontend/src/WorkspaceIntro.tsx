@@ -3,6 +3,9 @@ import { ArrowUpRight, Compass, Store, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppData, branchName } from "@/lib/domain";
 
+const assetBase = window.location.pathname.startsWith("/restopusula/") ? "/restopusula/" : "/";
+const previewMode = Boolean((window as Window & { __RESTOPUSULA_PREVIEW__?: boolean }).__RESTOPUSULA_PREVIEW__);
+
 type Scene = "menu" | "dining" | "stock" | "finance" | "team" | "delivery" | "branch";
 const sections: Record<string, { title: string; text: string; scene: Scene }> = {
   branches: { title: "Her şube, aynı yönetim standardı.", text: "Şubelerinizin satışlarını, giderlerini ve kaynaklarını birlikte izleyin.", scene: "branch" },
@@ -113,7 +116,7 @@ export default function WorkspaceIntro({ view, d, branch, go }: { view: string; 
   if (view === "dashboard") return (
     <>
     <section className="restaurant-banner" aria-labelledby={titleId}>
-      <img className="restaurant-photo" src="/images/restaurant-interior.webp" width={2172} height={724} alt="" fetchPriority="high" />
+      <img className="restaurant-photo" src={`${assetBase}images/restaurant-interior.webp`} width={2172} height={724} alt="" fetchPriority="high" />
       <div className="restaurant-banner-content">
         <span className="restaurant-eyebrow"><Compass size={15} /> RESTORANINIZIN KONTROL MERKEZİ</span>
         <h2 id={titleId}>Her şubede aynı özen.</h2>
@@ -125,7 +128,7 @@ export default function WorkspaceIntro({ view, d, branch, go }: { view: string; 
       </div>
       <span className="restaurant-scope"><Store size={14} />{branch === "all" ? "Tüm şubeler" : branchName(d, branch)}</span>
     </section>
-    {d.tenant && !dismissed && (
+    {d.tenant && !dismissed && !previewMode && (
       <SetupGuide d={d} go={go} canView={canView} onDismiss={() => { window.localStorage.setItem("restopusula-setup-dismissed", "1"); setDismissed(true); }} />
     )}
     </>

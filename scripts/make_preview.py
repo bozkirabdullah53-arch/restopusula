@@ -8,6 +8,7 @@ page = (dist / "index.html").read_text(encoding="utf-8")
 page = re.sub(r'<link rel="icon"[^>]*>', '', page)
 page = page.replace('href="/manifest.webmanifest"', 'href="./manifest.webmanifest"')
 page = page.replace('href="/icons/apple-touch-icon.png"', 'href="./icons/apple-touch-icon.png"')
+page = page.replace('href="/favicon.svg"', 'href="./favicon.svg"')
 def css(match):
     asset = dist / match.group(1).lstrip('/')
     return '<style>' + asset.read_text(encoding="utf-8") + '</style>'
@@ -40,4 +41,6 @@ web_page = page.replace(
 (pages / ".nojekyll").write_text("", encoding="utf-8")
 shutil.copy2(dist / 'manifest.webmanifest', pages / 'manifest.webmanifest')
 shutil.copytree(dist / 'icons', pages / 'icons', dirs_exist_ok=True)
+if (dist / 'favicon.svg').is_file():
+    shutil.copy2(dist / 'favicon.svg', pages / 'favicon.svg')
 print('GitHub Pages yayın klasörü hazır:', pages)
