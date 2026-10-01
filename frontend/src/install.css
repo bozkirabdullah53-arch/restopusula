@@ -1,0 +1,19 @@
+.install-area { margin: 0 0 18px; }
+.install-offer { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border: 1px solid #d4e4d9; border-radius: 14px; background: #f1f7f3; color: #163a2c; }
+.install-offer > svg { flex-shrink: 0; }
+.install-copy { flex: 1; min-width: 0; }
+.install-copy strong { display: block; font-size: 14px; }
+.install-copy p { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: #52685a; }
+.install-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.install-reopen { font-size: 12px; }
+.install-dialog { max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.install-dialog ol { list-style: decimal; padding-left: 22px; font-size: 14px; line-height: 1.7; }
+.install-dialog li + li { margin-top: 12px; }
+.install-note { font-size: 12px; line-height: 1.5; color: #64746a; }
+@media (max-width: 640px) {
+  .install-offer { flex-wrap: wrap; gap: 10px; padding: 14px; }
+  .install-copy { flex-basis: calc(100% - 42px); }
+  .install-actions { width: 100%; }
+  .install-actions > button:first-child { flex: 1; }
+}
+@media print { .install-area { display: none; } }

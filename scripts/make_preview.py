@@ -1,11 +1,13 @@
 """Package the compiled application as an offline, read-only visual preview."""
-import re, base64, mimetypes
+import re, base64, mimetypes, shutil
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 dist = root / "frontend" / "dist"
 page = (dist / "index.html").read_text(encoding="utf-8")
 page = re.sub(r'<link rel="icon"[^>]*>', '', page)
+page = page.replace('href="/manifest.webmanifest"', 'href="./manifest.webmanifest"')
+page = page.replace('href="/icons/apple-touch-icon.png"', 'href="./icons/apple-touch-icon.png"')
 def css(match):
     asset = dist / match.group(1).lstrip('/')
     return '<style>' + asset.read_text(encoding="utf-8") + '</style>'
@@ -22,7 +24,8 @@ page = re.sub(r'<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>', css, page)
 page = re.sub(r'<script[^>]*src="([^"]+)"[^>]*></script>', js, page)
 page = page.replace('<title>', '<title>Ön izleme · ')
 target = root / "Onizleme.html"
-target.write_text(page, encoding="utf-8")
+offline_page = re.sub(r'<link rel="(?:manifest|apple-touch-icon)"[^>]*>', '', page)
+target.write_text(offline_page, encoding="utf-8")
 print('Ön izleme hazır:', target)
 
 # GitHub Pages serves only this folder. The backend and local database are not
@@ -35,4 +38,6 @@ web_page = page.replace(
 ).replace("Baslat.cmd ile çalışan uygulamayı açın", "çalışan uygulamayı açın")
 (pages / "index.html").write_text(web_page, encoding="utf-8")
 (pages / ".nojekyll").write_text("", encoding="utf-8")
+shutil.copy2(dist / 'manifest.webmanifest', pages / 'manifest.webmanifest')
+shutil.copytree(dist / 'icons', pages / 'icons', dirs_exist_ok=True)
 print('GitHub Pages yayın klasörü hazır:', pages)

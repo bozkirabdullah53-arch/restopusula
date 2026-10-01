@@ -99,6 +99,7 @@ import {
 } from "@/lib/domain";
 import Dashboard from "./Dashboard";
 import WorkspaceIntro from "./WorkspaceIntro";
+import InstallApp from "./InstallApp";
 import { roleLabel, displayDate } from "@/lib/presentation";
 import Modules from "./Modules";
 import { ActionDialog, FormSpec, formFor, FieldInput } from "./forms";
@@ -770,6 +771,7 @@ export default function Workspace() {
               </DropdownMenu>
             </div>
           </div>
+          <InstallApp />
           <WorkspaceIntro view={view} d={d} branch={branch} go={go} />
           <div className="filterbar">
             <div className="filter-start">

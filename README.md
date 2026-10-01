@@ -63,6 +63,23 @@ AI anahtarları için veri dizininde `ai-secret.key` şifreleme dosyası oluştu
 
 ## Geliştirme
 
+### Masaüstü ve mobil uygulama kısayolu
+
+Web uygulaması ilk girişte kapatılabilir bir kısayol önerisi gösterir. Chrome / Edge
+yükleme olayı sağladığında **Uygulamayı yükle**, diğer durumlarda cihazına uygun
+adımları açan **Kısayol ekle** düğmesi görünür. iPhone / iPad için Safari’nin
+Paylaş → Ana Ekrana Ekle, Android için Chrome’un yükleme / ana ekrana ekleme
+menüsü, macOS Safari için Dock’a Ekle anlatılır. Son onay kullanıcıya aittir.
+
+**Daha sonra** öneriyi bu tarayıcıda 7 gün erteler; küçük kısayol düğmesi erişilebilir
+kalır. Bağımsız uygulama penceresinde öneri gizlenir. Yükleme için HTTPS (yerel
+geliştirmede localhost) kullanın. Kısayol çevrimdışı veri erişimi sağlamaz; satış,
+stok ve diğer işlemler için mevcut sunucuya bağlantı gerekir. Yerel `Onizleme.html`
+dosyasında yükleme önerisi gösterilmez; HTTPS üzerinde sunulan `docs/` ön izlemesi
+kendi manifest ve simgelerini kullanır.
+
+Kurulum etkileşimi testleri: `cd frontend && npm test`.
+
 ```bash
 python3 -m venv backend/.venv
 backend/.venv/bin/pip install -r backend/requirements-dev.txt
