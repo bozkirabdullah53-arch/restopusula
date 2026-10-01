@@ -337,7 +337,7 @@ export default function Workspace() {
     [question, setQuestion] = useState(""),
     [answer, setAnswer] = useState("");
   const pending = useRef(new Map<string, string>());
-  async function request(path: string, body?: Row, token = csrf) {
+  const request = useCallback(async (path: string, body?: Row, token = csrf) => {
     let r: Response;
     try {
       r = await fetch(path, {
@@ -364,7 +364,7 @@ export default function Workspace() {
         typeof data.detail === "string" ? data.detail : "İşlem tamamlanamadı.",
       );
     return data;
-  }
+  }, [csrf]);
   const refresh = useCallback(async () => {
     if (offlinePreview) return;
     setBusy(true);
@@ -884,6 +884,8 @@ export default function Workspace() {
               act={act}
               go={go}
               upload={upload}
+              request={request}
+              preview={offlinePreview}
             />
           )}
           <footer className="page-footer">

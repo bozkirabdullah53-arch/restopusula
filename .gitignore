@@ -1,5 +1,6 @@
 node_modules/
 frontend/dist/
+ui-checks/
 *.tsbuildinfo
 __pycache__/
 *.py[cod]
