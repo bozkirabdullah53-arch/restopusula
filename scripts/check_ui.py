@@ -66,6 +66,37 @@ with tempfile.TemporaryDirectory() as data:
             page.get_by_role('tab', name='Kullanıcı ve yetkiler', exact=True).click()
             expect(page.get_by_role('cell', name='İşletme sahibi', exact=True)).to_be_visible()
 
+            # AI settings stay responsive and never return or persist entered credentials.
+            for width in [1440, 1024, 768, 390, 360]:
+                page.set_viewport_size({'width': width, 'height': 960})
+                page.goto('http://127.0.0.1:8937/?view=settings&tab=ai')
+                expect(page.get_by_role('heading', name='Yapay zekâ bağlantısı', exact=True)).to_be_visible()
+                expect(page.get_by_label('API anahtarı', exact=True)).to_be_enabled()
+                check_page(page, 'settings-ai', width)
+                if width in [1440, 390]:
+                    page.screenshot(path=str(output / f'settings-ai-{width}.jpg'), full_page=True, type='jpeg', quality=85)
+            ai_key = 'sk-ui-test-not-a-real-api-key-123456789'
+            page.get_by_label('Sağlayıcı', exact=True).select_option('openai')
+            page.get_by_label('Model kimliği', exact=True).fill('gpt-4.1-mini')
+            page.get_by_label('API anahtarı', exact=True).fill(ai_key)
+            page.get_by_role('button', name='Bağlantıyı kaydet', exact=True).click()
+            expect(page.locator('.ai-feedback')).to_contain_text('Bağlantı kaydedildi')
+            expect(page.get_by_label('API anahtarı', exact=True)).to_have_value('')
+            expect(page.get_by_role('button', name='Bağlantıyı test et', exact=True)).to_be_enabled()
+            status = page.request.get('http://127.0.0.1:8937/api/ai-connection')
+            assert status.ok and ai_key not in status.text(), status.text()
+            storage = page.evaluate('JSON.stringify({local: {...localStorage}, session: {...sessionStorage}})')
+            assert ai_key not in storage, 'Credentials must not be stored in browser storage'
+            page.get_by_label('Model kimliği', exact=True).fill('gpt-4.1')
+            expect(page.get_by_role('button', name='Bağlantıyı test et', exact=True)).to_be_disabled()
+            page.get_by_role('button', name='Bağlantıyı kaydet', exact=True).click()
+            expect(page.locator('.ai-feedback')).to_contain_text('Bağlantı kaydedildi')
+            assert page.request.get('http://127.0.0.1:8937/api/ai-connection').json()['connection']['model'] == 'gpt-4.1'
+            page.get_by_role('button', name='Bağlantıyı kaldır', exact=True).click()
+            page.get_by_role('button', name='Evet, kaldır', exact=True).click()
+            expect(page.locator('.ai-feedback')).to_contain_text('Bağlantı kaldırıldı')
+            assert page.request.get('http://127.0.0.1:8937/api/ai-connection').json()['connection'] is None
+
             # Authenticated Excel download must keep ISO dates in API requests.
             page.goto('http://127.0.0.1:8937/?view=reports')
             with page.expect_response(lambda response: '/api/export?' in response.url) as report_response:
@@ -90,6 +121,17 @@ with tempfile.TemporaryDirectory() as data:
             expect(offline.get_by_role('dialog')).to_be_visible()
             expect(offline.get_by_role('button', name='Kapat', exact=True)).to_be_visible()
             offline.get_by_role('button', name='Kapat', exact=True).click()
+            offline.get_by_role('button', name='Ayarlar ve yetkiler', exact=True).click()
+            offline.get_by_role('tab', name='Yapay zekâ', exact=True).click()
+            expect(offline.get_by_role('heading', name='Yapay zekâ bağlantısı', exact=True)).to_be_visible()
+            expect(offline.get_by_label('API anahtarı', exact=True)).to_be_disabled()
+            expect(offline.get_by_role('button', name='Bağlantıyı kaydet', exact=True)).to_be_disabled()
+            expect(offline.get_by_role('button', name='Bağlantıyı test et', exact=True)).to_be_disabled()
+            offline.get_by_label('Sağlayıcı', exact=True).select_option('gemini')
+            expect(offline.get_by_label('Model kimliği', exact=True)).to_have_value('gemini-2.5-flash')
+            for width in [1440, 1024, 768, 390, 360]:
+                offline.set_viewport_size({'width': width, 'height': 960})
+                check_page(offline, 'offline-settings-ai', width)
             assert not offline_requests, offline_requests
             assert not errors, errors
             browser.close()

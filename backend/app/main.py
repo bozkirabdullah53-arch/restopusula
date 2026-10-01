@@ -200,5 +200,8 @@ def tenant_backup(request:Request):
     # Only this tenant's records; never expose other tenants or session/password material.
     return Response(json.dumps({'version':1,'exported_at':now(),'data':d},ensure_ascii=False,indent=2).encode(),media_type='application/json',headers={'Content-Disposition':'attachment; filename="restopusula-isletme-yedegi.json"'})
 
+from .ai_connections import router as ai_connection_router
+app.include_router(ai_connection_router)
+
 FRONTEND=Path(__file__).resolve().parents[2]/'frontend'/'dist'
 if FRONTEND.exists():app.mount('/',StaticFiles(directory=FRONTEND,html=True),name='frontend')
