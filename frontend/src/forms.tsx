@@ -17,6 +17,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { AppData, Row, byKind, today, month, branchName } from "@/lib/domain";
+import { roleLabel } from "@/lib/presentation";
 
 export type Field = {
   key: string;
@@ -192,7 +193,7 @@ export function formFor(
       action,
       title: "Ürün ekle",
       description:
-        "Satış fiyatını tanımlayın, reçeteyi ürün kartından tamamlayın.",
+        "Satış fiyatını tanımlayın, ürün tarifini ürün kartından tamamlayın.",
       fields: [
         name,
         {
@@ -213,7 +214,7 @@ export function formFor(
     },
     recipe: {
       action,
-      title: "Reçete malzemesi",
+      title: "Tarife malzeme ekle",
       description:
         "Bir satış biriminde kullanılan miktarı malzemenin kendi birimiyle girin. Örneğin kg birimindeki malzemede 400 g = 0,4 kg.",
       fields: [
@@ -229,7 +230,7 @@ export function formFor(
     },
     material: {
       action,
-      title: "Malzeme & açılış stoğu",
+      title: "Malzeme ve açılış stoğu",
       description:
         "Birim maliyet KDV hariçtir. Maliyeti bilmiyorsanız boş bırakın.",
       fields: [
@@ -430,7 +431,7 @@ export function formFor(
       action,
       title: "Satış iadesi / ters kayıt",
       description:
-        "Tam satış iadesi tahsilatı ve reçete stok hareketlerini ters çevirir. Asıl kayıt korunur.",
+        "Tam satış iadesi tahsilatı ve tarife bağlı stok hareketlerini ters çevirir. Asıl kayıt korunur.",
       fields: [
         branchField,
         { key: "reason", label: "İade nedeni", type: "textarea" },
@@ -727,7 +728,7 @@ export function formFor(
     },
     utility: {
       action,
-      title: "Sayaç & enerji faturası",
+      title: "Sayaç ve enerji faturası",
       description:
         "Sayaç tüketimi ve fatura kaydı birlikte tutulur. Gider kaydı otomatik oluşur.",
       fields: [
@@ -772,7 +773,7 @@ export function formFor(
           type: "password",
           help: "En az 10 karakter.",
         },
-        { key: "role", label: "Rol", type: "select", options: opts(roles) },
+        { key: "role", label: "Rol", type: "select", options: roles.map((value) => ({ value, label: roleLabel(value) })) },
         {
           ...branchField,
           key: "member_branch_id",

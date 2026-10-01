@@ -57,4 +57,26 @@ class BusinessFlows(unittest.TestCase):
    for n in z.namelist():ElementTree.fromstring(z.read(n))
    xml=z.read('xl/worksheets/sheet1.xml').decode();self.assertIn('=SUM(A1:A2)',xml);self.assertNotIn('<f>',xml)
 
+ def test_turkish_export_captions_keep_stored_codes(self):
+  self.action('sale',branch_id=self.branch,channel='Online sipariş',date='2026-09-30',discount='0',items=[{'product_id':self.product,'quantity':'1'}],payments=[{'account_id':self.account,'amount':'500'}])
+  self.action('expense',branch_id=self.branch,name='Test gider',category='Diğer',kind='expense',amount='100',vat_rate='0',date='2026-09-30',status='pending')
+  def captions(kind):
+   response=self.client.get(f'/api/export?kind={kind}&start=2026-09-01&end=2026-09-30')
+   self.assertEqual(response.status_code,200,response.text)
+   with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+    from xml.etree import ElementTree
+    root=ElementTree.fromstring(archive.read('xl/worksheets/sheet1.xml'))
+    return [node.text for node in root.iter() if node.tag.endswith('}t')]
+  sales=captions('sales');expenses=captions('expenses');ledger=captions('ledger')
+  self.assertIn('Tamamlandı',sales);self.assertIn('İnternet siparişi',sales)
+  self.assertIn('Ödeme bekliyor',expenses);self.assertIn('İşletme gideri',expenses)
+  self.assertIn('Satış tahsilatı',ledger)
+  for raw in ['completed','pending','expense','sale']:
+   self.assertNotIn(raw,sales+expenses+ledger)
+  data=self.data()
+  self.assertEqual(data['sales'][0]['status'],'completed')
+  self.assertEqual(data['sales'][0]['channel'],'Online sipariş')
+  self.assertEqual(data['expenses'][0]['status'],'pending')
+  self.assertEqual(data['expenses'][0]['kind'],'expense')
+
 if __name__=='__main__':unittest.main(verbosity=2)

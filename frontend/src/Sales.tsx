@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { channelLabel, displayDate } from "@/lib/presentation";
 import {
   Plus,
   Minus,
@@ -396,7 +397,7 @@ export default function Sales({
                   {["Masa", "Paket servis", "Gel-al", "Online sipariş"].map(
                     (s) => (
                       <SelectItem value={s} key={s}>
-                        {s}
+                        {channelLabel(s)}
                       </SelectItem>
                     ),
                   )}
@@ -605,9 +606,9 @@ export default function Sales({
                 )
                 .map((s) => (
                   <TableRow key={s.id}>
-                    <TableCell>{s.date}</TableCell>
+                    <TableCell>{displayDate(s.date)}</TableCell>
                     <TableCell>{branchName(d, s.branch_id)}</TableCell>
-                    <TableCell>{s.channel}</TableCell>
+                    <TableCell>{channelLabel(s.channel)}</TableCell>
                     <TableCell>{s.payment}</TableCell>
                     <TableCell>{exactMoney(s.total_cents)}</TableCell>
                     <TableCell>{exactMoney(s.cost_cents)}</TableCell>
@@ -642,7 +643,7 @@ export default function Sales({
                   <TableCell colSpan={8}>
                     <Blank
                       title="İlk satışınız burada görünecek."
-                      text="Adisyonu tamamladığınızda tahsilat ve reçete stok hareketleri birlikte kaydedilir."
+                      text="Adisyonu tamamladığınızda tahsilat ve tarife bağlı stok hareketleri birlikte kaydedilir."
                     />
                   </TableCell>
                 </TableRow>

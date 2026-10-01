@@ -239,7 +239,7 @@ export function insights(d: AppData, branch = "all") {
       id: "cost",
       type: "info",
       title: "Kârlılık için maliyet eksik",
-      text: `${missing.length} satışta reçete veya malzeme maliyeti eksik.`,
+      text: `${missing.length} satışta ürün tarifi veya malzeme maliyeti eksik.`,
       view: "products",
     });
   return out;

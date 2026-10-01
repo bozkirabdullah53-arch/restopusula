@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from .database import connect,init_db,uid,now,rows,one,insert,audit,DATA_DIR
 from .security import authenticate,public_user,require_permission,password_hash,password_ok,session_hash,rate_limit,effective_permissions
 from .operations import execute,text,day,record
+from .presentation import code_label,note_label
 
 logger=logging.getLogger('restopusula')
 ALLOWED_ORIGINS=os.environ.get('MISE_ALLOWED_ORIGINS','http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8000,http://localhost:8000').split(',')
@@ -179,15 +180,15 @@ def export(request:Request,kind:str='sales',start:str='2000-01-01',end:str='2100
         if branch_id!='all' and branch_id not in bnames:raise HTTPException(403,'Şubeye erişim yetkiniz yok.')
         def scope(r):return (branch_id=='all' or r['branch_id']==branch_id) and start<=r.get('date',start)<=end
         if kind=='sales':
-            require_permission(u,'sales','export');headers=['Tarih','Şube','Satış no','Kanal','Ödeme','KDV dahil ciro (TL)','KDV hariç ciro (TL)','Maliyet (TL)','Durum'];data=[[r['date'],bnames.get(r['branch_id']),r['id'],r['channel'],r['payment'],r['total_cents']/100,r['net_cents']/100,r['cost_cents']/100 if r['cost_cents'] is not None else None,r['status']] for r in d['sales'] if scope(r)]
+            require_permission(u,'sales','export');headers=['Tarih','Şube','Satış no','Kanal','Ödeme','KDV dahil ciro (TL)','KDV hariç ciro (TL)','Maliyet (TL)','Durum'];data=[[r['date'],bnames.get(r['branch_id']),r['id'],code_label(r['channel']),r['payment'],r['total_cents']/100,r['net_cents']/100,r['cost_cents']/100 if r['cost_cents'] is not None else None,code_label(r['status'])] for r in d['sales'] if scope(r)]
         elif kind=='expenses':
-            require_permission(u,'expenses','export');headers=['Tarih','Şube','Açıklama','Kategori','Tür','Tutar (TL)','KDV hariç (TL)','Vade','Durum'];data=[[r['date'],bnames.get(r['branch_id']),r['name'],r['category'],r['kind'],r['amount_cents']/100,r['net_cents']/100,r['due_date'],r['status']] for r in d['expenses'] if scope(r)]
+            require_permission(u,'expenses','export');headers=['Tarih','Şube','Açıklama','Kategori','Tür','Tutar (TL)','KDV hariç (TL)','Vade','Durum'];data=[[r['date'],bnames.get(r['branch_id']),r['name'],r['category'],code_label(r['kind']),r['amount_cents']/100,r['net_cents']/100,r['due_date'],code_label(r['status'])] for r in d['expenses'] if scope(r)]
         elif kind=='inventory':
             require_permission(u,'inventory','export');mat={x['id']:x for x in d['materials']};headers=['Şube','Malzeme','Miktar','Birim','Birim maliyet (TL)','Minimum stok'];data=[[bnames.get(r['branch_id']),mat[r['material_id']]['name'],r['quantity'],mat[r['material_id']]['unit'],mat[r['material_id']]['cost_cents']/100 if mat[r['material_id']]['cost_cents'] is not None else None,mat[r['material_id']]['min_stock']] for r in d['inventory'] if scope(r)]
         elif kind=='ledger':
-            require_permission(u,'accounts','export');accounts={a['id']:a['name'] for a in d['accounts']};headers=['Tarih','Şube','Hesap','Tutar (TL)','Tür','Açıklama'];data=[[r['date'],bnames.get(r['branch_id']),accounts.get(r['account_id']),r['amount_cents']/100,r['kind'],r['note']] for r in d['ledger'] if scope(r)]
+            require_permission(u,'accounts','export');accounts={a['id']:a['name'] for a in d['accounts']};headers=['Tarih','Şube','Hesap','Tutar (TL)','Tür','Açıklama'];data=[[r['date'],bnames.get(r['branch_id']),accounts.get(r['account_id']),r['amount_cents']/100,code_label(r['kind']),note_label(r['note'])] for r in d['ledger'] if scope(r)]
         else:raise HTTPException(400,'Rapor türü tanınmadı.')
-        audit(c,u,'export',f'{kind} Excel raporu dışa aktarıldı')
+        audit(c,u,'export',f'{code_label(kind)} Excel raporu dışa aktarıldı')
         payload=xlsx(headers,data)
     return Response(payload,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',headers={'Content-Disposition':f'attachment; filename="restopusula-{kind}-{start}.xlsx"'})
 @app.get('/api/backup')

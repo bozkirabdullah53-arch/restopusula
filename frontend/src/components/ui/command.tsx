@@ -30,8 +30,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title = "Panelde ara",
+  description = "Bir modül veya işlem arayın.",
   children,
   className,
   showCloseButton = true,

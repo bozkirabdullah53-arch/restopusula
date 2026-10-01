@@ -25,7 +25,7 @@ Python **3.11 veya üzeri** (Python Launcher dahil) ve Node.js **22.13 veya üze
 1. GitHub'da **Code → Download ZIP** ile indirin ve arşivi açın. Proje içindeki dosyaları `C:\Users\Abdullah\OneDrive\Desktop\Restoran zincirleri yönetim sistemi` klasörüne yerleştirin.
 2. **Kurulum.cmd** dosyasını çift tıklayın. Python ortamını oluşturur, bağımlılıkları kurar ve arayüzü derler.
 3. **Baslat.cmd** dosyasını çift tıklayın. Panel `http://127.0.0.1:8000` adresinde açılır.
-4. **İşletmeyi kur** ile ilk işletme sahibini oluşturun. Şube → tahsilat hesabı → malzeme → ürün → reçete sırasıyla kayıtlarınızı ekleyin.
+4. **İşletmeyi kur** ile ilk işletme sahibini oluşturun. Şube → tahsilat hesabı → malzeme → ürün → ürün tarifi sırasıyla kayıtlarınızı ekleyin.
 
 Sunucu penceresi açık kaldığı sürece uygulama çalışır. Kapatmak için sunucu penceresinde **Ctrl+C** kullanın. Yerel bağlantı varsayılan olarak yalnızca aynı bilgisayara açıktır. Windows komut dosyaları bu geliştirme ortamında çalıştırılamadı; Python ve arayüz derlemesi Linux ortamında doğrulandı.
 
@@ -34,8 +34,8 @@ Sunucu penceresi açık kaldığı sürece uygulama çalışır. Kapatmak için 
 - İşletme hesabı, giriş/çıkış, zorunlu geçici şifre değişimi; rol, modül ve şube yetkilendirmesi.
 - Şube ve tarih filtreli yönetici paneli; kayıtlı satış, gider, stok ve ödeme uyarıları.
 - Masa kartları, açık adisyon taslağı, satış kaydı, indirim, birden fazla hesapla tahsilat; satış iadesi için gerekçeli ters kayıt.
-- Ürünler, reçeteler, malzemeler; stok giriş/çıkış, sayım, fire ve iki taraflı şube transferi.
-- Satışla birlikte reçete stok düşümü ve tahsilat hareketi; yetersiz stokta işlemin bütünüyle reddi.
+- Ürünler, ürün tarifleri, malzemeler; stok giriş/çıkış, sayım, fire ve iki taraflı şube transferi.
+- Satışla birlikte tarife bağlı stok düşümü ve tahsilat hareketi; yetersiz stokta işlemin bütünüyle reddi.
 - Kasa/banka/POS hesapları, açılış bakiyesi ve değiştirilemeyen hesap hareketleri.
 - İşletme gideri, alış faturası ve manuel mali yükümlülük; vade takibi, ödeme ve ters kayıt. Fatura tahakkuku ile ödemesi ayrı tutulur.
 - Tedarikçiler ve satın alma aşamaları; teslim alma stok hareketi, fatura ve ödeme bağlantısı.
@@ -48,7 +48,7 @@ Sunucu penceresi açık kaldığı sürece uygulama çalışır. Kapatmak için 
 
 Bu ilk sürüm, tüm ayrıntılı ticari gereksinimlerin tamamlandığı anlamına gelmez. POS cihazı, banka, online sipariş, e-fatura/e-arşiv, OCR ve dil modeli servisleri **bağlı değildir**. Entegrasyon ekranları bu durumu açıkça gösterir. Otomatik bordro/mevzuat hesabı, ayrıntılı muhasebe defteri, otomatik vergi beyanı ve yedekten geri yükleme arayüzü yoktur.
 
-Kayıtlı işletme sonucu = KDV hariç kayıtlı satış − satış anındaki reçete maliyeti − KDV hariç işletme gideri. Reçete veya maliyet eksikse sonuç hesaplanmaz. Tedarikçi alış faturası, reçete maliyetiyle aynı gideri ikinci kez saymamak için işletme giderine eklenmez. Bu gösterge kayıt dışındaki giderleri ve vergi sonrası muhasebe kârını kapsamaz. Stok maliyeti malzeme bazında ağırlıklı ortalamadır; şube bazında ayrı maliyet katmanları bulunmaz. Puantaj saatleri manuel kayıtlardır, yasal bordro hesabı değildir.
+Kayıtlı işletme sonucu = KDV hariç kayıtlı satış − satış anındaki tarif maliyeti − KDV hariç işletme gideri. Ürün tarifi veya maliyet eksikse sonuç hesaplanmaz. Tedarikçi alış faturası, tarif maliyetiyle aynı gideri ikinci kez saymamak için işletme giderine eklenmez. Bu gösterge kayıt dışındaki giderleri ve vergi sonrası muhasebe kârını kapsamaz. Stok maliyeti malzeme bazında ağırlıklı ortalamadır; şube bazında ayrı maliyet katmanları bulunmaz. Puantaj saatleri manuel kayıtlardır, yasal bordro hesabı değildir.
 
 Çok işletmeli ve çok şubeli kayıt ayrımı uygulanır; **100 şube kapasitesi için yük testi yapılmadı**. SQLite tek sunuculu yerel kullanım için başlangıç altyapısıdır. Ticari SaaS yayını için PostgreSQL'e geçiş, HTTPS, dağıtık oturum/rate limit, bağımsız güvenlik ve yük testi, yedek geri dönüş denemesi ve ilgili servis entegrasyonları ayrıca tamamlanmalıdır. API `MISE_SECURE_COOKIE=1` ile HTTPS üzerinde güvenli çerez kullanabilir. Canlı veritabanını eşzamanlı OneDrive senkronizasyonuyla birden fazla bilgisayardan kullanmayın; tek sunucuda çalıştırıp yedek arşivini senkronize edin.
 
@@ -76,3 +76,18 @@ python3 scripts/make_preview.py
 ```
 
 Testler geçici veritabanlarıyla satış, stok, iade, ödeme, tekrar isteğin tek işleme dönüşmesi, işletme/şube erişimi ve Excel dosyası bütünlüğünü doğrular. Test verileri gerçek çalışma alanına eklenmez.
+
+## Arayüz ve dil kontrolü
+
+Menüler, ürün tarifleri, işlem başlıkları ve rapor durumları Türkçedir. Teknik işlem ve rol kodları veritabanında korunur; kullanıcıya gösterilen karşılıklar ayrı bir sunum katmanında çevrilir. Restoran görseli yerel WebP dosyasıdır; ön izleme oluşturulurken HTML içine gömülür.
+
+GitHub kontrolleri arayüz derlemesini, işletme akışlarını ve 360, 390, 768, 1024 ve 1440 piksel genişlikte tarayıcı kontrollerini çalıştırır. `restopusula-preview` çıktısı güncel ön izlemeyi, ekran görüntülerini ve kontrol sonuçlarını içerir. Tarayıcı kontrolleri gerçek işletme verilerinden ayrı geçici bir veritabanı kullanır.
+
+Yerelde tarayıcı kontrolü için:
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python scripts/make_preview.py
+python scripts/check_ui.py
+```

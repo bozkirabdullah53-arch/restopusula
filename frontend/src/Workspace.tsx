@@ -98,12 +98,14 @@ import {
   num,
 } from "@/lib/domain";
 import Dashboard from "./Dashboard";
+import WorkspaceIntro from "./WorkspaceIntro";
+import { roleLabel, displayDate } from "@/lib/presentation";
 import Modules from "./Modules";
 import { ActionDialog, FormSpec, formFor, FieldInput } from "./forms";
 
 const groups = [
   {
-    label: "VİZYON & YÖNETİM",
+    label: "YÖNETİM",
     items: [
       { id: "dashboard", name: "Genel bakış", icon: LayoutDashboard },
       { id: "branches", name: "Şubeler", icon: Store },
@@ -113,25 +115,25 @@ const groups = [
   {
     label: "OPERASYON",
     items: [
-      { id: "sales", name: "Satış & masalar", icon: ReceiptText },
-      { id: "products", name: "Ürünler & reçeteler", icon: UtensilsCrossed },
-      { id: "inventory", name: "Stok & fire", icon: Package },
+      { id: "sales", name: "Satış ve masalar", icon: ReceiptText },
+      { id: "products", name: "Ürünler ve tarifler", icon: UtensilsCrossed },
+      { id: "inventory", name: "Stok ve fire", icon: Package },
       { id: "purchases", name: "Satın alma", icon: ShoppingBag },
     ],
   },
   {
     label: "FİNANS",
     items: [
-      { id: "accounts", name: "Kasa & banka", icon: Wallet },
-      { id: "expenses", name: "Giderler & ödemeler", icon: CircleDollarSign },
-      { id: "budget", name: "Bütçe & vergi", icon: ChartNoAxesCombined },
+      { id: "accounts", name: "Kasa ve banka", icon: Wallet },
+      { id: "expenses", name: "Giderler ve ödemeler", icon: CircleDollarSign },
+      { id: "budget", name: "Bütçe ve vergi", icon: ChartNoAxesCombined },
     ],
   },
   {
-    label: "EKİP & KAYNAKLAR",
+    label: "EKİP ve KAYNAKLAR",
     items: [
-      { id: "employees", name: "Personel & puantaj", icon: Users },
-      { id: "resources", name: "Araç & enerji", icon: Truck },
+      { id: "employees", name: "Personel ve puantaj", icon: Users },
+      { id: "resources", name: "Araç ve enerji", icon: Truck },
     ],
   },
 ];
@@ -139,7 +141,7 @@ const descriptions: Row = {
   dashboard: "Satıştan servise, tüm şubeleriniz aynı masada.",
   branches: "Şubelerinizin performansını ve kaynaklarını merkezden yönetin.",
   sales: "Masa, adisyon ve tahsilat akışınızı aynı ekranda yönetin.",
-  products: "Menünüzün maliyetini, reçetesini ve katkısını görün.",
+  products: "Ürün tariflerini, malzeme miktarlarını ve satış maliyetini birlikte yönetin.",
   inventory: "Taze stok, kontrollü fire, izlenebilir hareketler.",
   purchases: "Talep ve teslimat arasında kaybolan hiçbir kayıt olmasın.",
   accounts: "Nakit, banka ve kart tahsilatlarının kontrolü sizde.",
@@ -210,7 +212,7 @@ function Navigation({
           </span>
           <span>
             resto<span className="orange">pusula</span>
-            <small>RESTAURANT OS</small>
+            <small>RESTORAN YÖNETİMİ</small>
           </span>
         </button>
         <button
@@ -269,7 +271,7 @@ function Navigation({
         {allowed("settings") && (
           <button className="settings-nav" onClick={() => nav("settings")}>
             <Settings2 size={17} />
-            Ayarlar & yetkiler
+            Ayarlar ve yetkiler
           </button>
         )}
         <DropdownMenu>
@@ -278,7 +280,7 @@ function Navigation({
               <span className="avatar">{d.user?.name?.charAt(0) || "R"}</span>
               <span>
                 <strong>{d.user?.name || "Merkez yönetimi"}</strong>
-                <small>{d.user?.role || "İşletme sahibi"}</small>
+                <small>{roleLabel(d.user?.role || "Patron")}</small>
               </span>
               <Ellipsis size={18} />
             </button>
@@ -562,7 +564,7 @@ export default function Workspace() {
       view === "dashboard"
         ? "İşletmenize bir bakış"
         : view === "settings"
-          ? "Ayarlar & yetkiler"
+          ? "Ayarlar ve yetkiler"
           : view.startsWith("report-")
             ? "Rapor ön izlemesi"
             : active?.name || "Genel bakış";
@@ -591,7 +593,7 @@ export default function Workspace() {
         : "Kayıtlı stoklarda kritik alt sınır uyarısı yok. Kayıtsız stoklar için durum belirlenemez.";
     } else if (s.includes("ödeme") || s.includes("fatura")) {
       answer = m.upcoming.length
-        ? `Önümüzdeki 7 gün ve geciken kayıtlar: ${m.upcoming.map((e) => `${e.name} ${money(e.amount_cents)} (${e.due_date})`).join("; ")}.`
+        ? `Önümüzdeki 7 gün ve geciken kayıtlar: ${m.upcoming.map((e) => `${e.name} ${money(e.amount_cents)} (${displayDate(e.due_date)})`).join("; ")}.`
         : "Bu dönem için kayıtlı yaklaşan ödeme bulunmuyor.";
     } else if (s.includes("ürün") || s.includes("satan")) {
       const ids = new Set(m.sales.map((x) => x.id));
@@ -616,7 +618,7 @@ export default function Workspace() {
       answer =
         m.gross === null
           ? "Bu hesaplama için gerekli satış verisi bulunmuyor."
-          : `KDV dahil ciro: ${money(m.gross)}. KDV hariç işletme gideri: ${money(m.spend)}. Kayıtlı işletme sonucu: ${money(m.result)}.${m.result === null ? " Reçete veya maliyet verisi eksik; kâr hesaplanmadı." : ""}`;
+          : `KDV dahil ciro: ${money(m.gross)}. KDV hariç işletme gideri: ${money(m.spend)}. Kayıtlı işletme sonucu: ${money(m.result)}.${m.result === null ? " Ürün tarifi veya maliyet verisi eksik; kâr hesaplanmadı." : ""}`;
     } else
       answer =
         "Şube giderleri, en çok satan ürün, kritik stok, yaklaşan ödeme veya ciro hakkında soru sorabilirsiniz. Özetler kayıtlı verilerden hesaplanır.";
@@ -661,7 +663,7 @@ export default function Workspace() {
   }, [d, branch, period, start, end]);
   return (
     <SidebarProvider
-      style={{ "--sidebar-width": "15.5rem" } as React.CSSProperties}
+      style={{ "--sidebar-width": "16.5rem" } as React.CSSProperties}
     >
       <Navigation view={view} d={d} go={go} logout={logout} />
       <SidebarInset className="app-main">
@@ -673,7 +675,7 @@ export default function Workspace() {
             <strong>{active?.name || title}</strong>
           </div>
           <div className="topbar-right">
-            <button className="search-button" onClick={() => setCommand(true)}>
+            <button className="search-button" aria-label="Panelde ara" onClick={() => setCommand(true)}>
               <Search size={17} />
               <span>Panelde ara</span>
               <kbd>Ctrl K</kbd>
@@ -698,6 +700,7 @@ export default function Workspace() {
                 className="top-avatar"
                 onClick={() => open("password")}
                 title="Şifre değiştir"
+                aria-label="Şifre değiştir"
               >
                 {auth.name.charAt(0)}
               </button>
@@ -767,6 +770,7 @@ export default function Workspace() {
               </DropdownMenu>
             </div>
           </div>
+          <WorkspaceIntro view={view} d={d} branch={branch} go={go} />
           <div className="filterbar">
             <div className="filter-start">
               <Select value={branch} onValueChange={setBranch}>
@@ -1022,7 +1026,7 @@ export default function Workspace() {
       <Sheet open={notifications} onOpenChange={setNotifications}>
         <SheetContent className="detail-sheet">
           <SheetHeader>
-            <SheetTitle>Bildirimler & uyarılar</SheetTitle>
+            <SheetTitle>Bildirimler ve uyarılar</SheetTitle>
             <SheetDescription>
               Kayıtlı stok, bütçe ve ödeme verilerinden oluşturulur.
             </SheetDescription>
@@ -1094,7 +1098,7 @@ export default function Workspace() {
                 <span className="eyebrow">KAYITLI VERİ ANALİZİ</span>
                 <p>{answer}</p>
                 <small>
-                  {m.r.start} – {m.r.end} ·{" "}
+                  {displayDate(m.r.start)} – {displayDate(m.r.end)} ·{" "}
                   {branch === "all" ? "Tüm şubeler" : branchName(d, branch)}
                 </small>
               </div>
@@ -1123,7 +1127,7 @@ export default function Workspace() {
           </form>
         </SheetContent>
       </Sheet>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-right" containerAriaLabel="Bildirimler" />
     </SidebarProvider>
   );
 }
