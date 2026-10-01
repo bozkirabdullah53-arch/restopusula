@@ -81,6 +81,7 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 .setup-strip strong { color: #314e37; }
 .setup-strip p { color: #62745d; line-height: 1.55; }
 .setup-strip button { color: #365538; border-color: #c7d3bb; }
+.preview-mode .setup-strip { display: none; }
 .setup-guide { background: #fffef9; border: 1px solid #dce4d5; border-radius: 15px; padding: 22px 24px 17px; margin: -3px 0 22px; box-shadow: 0 8px 24px #1c402008; }
 .setup-guide-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
 .setup-guide-kicker { color: #8b6840; font-size: .65rem; letter-spacing: .14em; font-weight: 700; }

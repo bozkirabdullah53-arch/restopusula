@@ -716,7 +716,7 @@ export default function Workspace() {
             )}
           </div>
         </header>
-        <main className="page-content">
+        <main className={`page-content ${offlinePreview ? "preview-mode" : ""}`}>
           {offlinePreview && (
             <div className="offline-preview-note">
               <Info size={16} />
